@@ -8,27 +8,77 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 
 #pragma region CreateSamplers
 
-	D3D12_STATIC_SAMPLER_DESC staticSampler = {};
-	staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//フィルタリングの方法
-	staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-	staticSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-	staticSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-	staticSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
-	staticSampler.MaxLOD = D3D12_FLOAT32_MAX;    //ありったけのMipmapを使う
-	staticSampler.ShaderRegister = 0;    //レジスタ番号0
-	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;    //PixelShaderで使う
-	samplers_[SamplerID::Static] = staticSampler;
+	D3D12_STATIC_SAMPLER_DESC base{};
+	base.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	base.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	base.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	base.MinLOD = 0.0f;
+	base.MaxLOD = D3D12_FLOAT32_MAX;
+	base.MipLODBias = 0.0f;
+	base.MaxAnisotropy = 1;
+	base.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	base.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	base.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	base.ShaderRegister = 0;
+	base.RegisterSpace = 0;
+	base.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
-	D3D12_STATIC_SAMPLER_DESC clampSampler = {};
-	clampSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	clampSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;  // CLAMPに変更
-	clampSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;  // CLAMPに変更
-	clampSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;  // CLAMPに変更
-	clampSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	clampSampler.MaxLOD = D3D12_FLOAT32_MAX;
-	clampSampler.ShaderRegister = 0;
-	clampSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	samplers_[SamplerID::Clamp] = clampSampler;
+	D3D12_STATIC_SAMPLER_DESC def = base;
+	samplers_[SamplerID::Default] = def;
+
+	D3D12_STATIC_SAMPLER_DESC clampT = base;
+	clampT.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+	samplers_[SamplerID::ClampT] = clampT;
+
+	D3D12_STATIC_SAMPLER_DESC mirrorT = base;
+	mirrorT.AddressV = D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+	samplers_[SamplerID::MirrorT] = mirrorT;
+
+	D3D12_STATIC_SAMPLER_DESC clampS = base;
+	clampS.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+	samplers_[SamplerID::ClampS] = clampS;
+
+	D3D12_STATIC_SAMPLER_DESC mirrorS = base;
+	mirrorS.AddressU = D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+	samplers_[SamplerID::MirrorS] = mirrorS;
+
+	D3D12_STATIC_SAMPLER_DESC magNearest = base;
+	magNearest.Filter = D3D12_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+	samplers_[SamplerID::MagNearest] = magNearest;
+
+	D3D12_STATIC_SAMPLER_DESC magLinear = base;
+	magLinear.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplers_[SamplerID::MagLinear] = magLinear;
+
+	D3D12_STATIC_SAMPLER_DESC minNearest = base;
+	minNearest.Filter = D3D12_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+	samplers_[SamplerID::MinNearest] = minNearest;
+
+	D3D12_STATIC_SAMPLER_DESC minLinear = base;
+	minLinear.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplers_[SamplerID::MinLinear] = minLinear;
+
+	D3D12_STATIC_SAMPLER_DESC minNearestMipNearest = base;
+	minNearestMipNearest.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplers_[SamplerID::MinNearestMipmapNearest] = minNearestMipNearest;
+
+	D3D12_STATIC_SAMPLER_DESC minLinearMipNearest = base;
+	minLinearMipNearest.Filter = D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	samplers_[SamplerID::MinLinearMipmapNearest] = minLinearMipNearest;
+
+	D3D12_STATIC_SAMPLER_DESC minNearestMipLinear = base;
+	minNearestMipLinear.Filter = D3D12_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+	samplers_[SamplerID::MinNearestMipmapLinear] = minNearestMipLinear;
+
+	D3D12_STATIC_SAMPLER_DESC minLinearMipLinear = base;
+	minLinearMipLinear.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplers_[SamplerID::MinLinearMipmapLinear] = minLinearMipLinear;
+
+	D3D12_STATIC_SAMPLER_DESC clampClampMinMagNearest = base;
+	clampClampMinMagNearest.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+	clampClampMinMagNearest.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+	clampClampMinMagNearest.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplers_[SamplerID::ClampClamp_MinMagNearest] = clampClampMinMagNearest;
 
 #pragma endregion
 }
@@ -99,7 +149,7 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	//DescriptorTableでまとめる
 	D3D12_DESCRIPTOR_RANGE pixelSrvDescriptor[1] = {};
 	pixelSrvDescriptor[0].BaseShaderRegister = 0;
-	pixelSrvDescriptor[0].NumDescriptors = config.srvNums.first;
+	pixelSrvDescriptor[0].NumDescriptors = config.srvNums.second;
 	pixelSrvDescriptor[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pixelSrvDescriptor[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 

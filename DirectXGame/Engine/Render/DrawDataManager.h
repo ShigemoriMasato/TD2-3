@@ -23,6 +23,7 @@ public:
 		assert(index >= 0 && index < static_cast<int>(drawDatas_.size()) && "DrawDataManager::GetDrawData: Invalid DrawData index");
 		return drawDatas_[index].first;
 	}
+	std::vector<DrawData> GetDrawData(const std::vector<int>& indices) const;
 
 	//即席
 	void CoppyBufferData(int drawDataIndex, const void* data, size_t size) {

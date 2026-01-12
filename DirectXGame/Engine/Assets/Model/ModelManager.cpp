@@ -11,18 +11,16 @@
 #include <assimp/postprocess.h>
 
 namespace {
-	std::string ExtensionSearcher(std::string directoryPath, std::vector<std::string> ext) {
-		if (ext.empty()) {
-			return "";
+	std::vector<std::string> ExtensionSearcher(std::string directoryPath, std::vector<std::string> exts) {
+		std::vector<std::string> result;
+		result.reserve(64); // 目安。分かるならもっと正確に
+
+		for (const auto& ext : exts) {
+			auto files = SearchFiles(directoryPath, ext);
+			result.insert(result.end(), std::make_move_iterator(files.begin()), std::make_move_iterator(files.end()));
 		}
 
-		auto files = SearchFiles(directoryPath, ext.front());
-		if (files.size() >= 1) {
-			return files.front();
-		}
-
-		ext.erase(ext.begin());
-		return ExtensionSearcher(directoryPath, ext);
+		return result;
 	}
 }
 
@@ -43,31 +41,31 @@ void ModelManager::Initialize(TextureManager* textureManager, DrawDataManager* d
 	LoadModel("Assets/.EngineResource/Model/DefaultDesc");
 }
 
-int ModelManager::LoadModel(std::string filePath) {
+int ModelManager::LoadModel(std::string filePath, std::string fileName) {
 	// ファイルパスの確認と修正
-	std::string fileName = FilePathChecker(filePath);
+	std::string factName = FilePathChecker(filePath, fileName);
+	std::string path = (filePath + "/" + factName);
 
 	// すでに読み込んでいたらIDを返す
-	const auto it = modelFilePaths_.find(filePath);
+	const auto it = modelFilePaths_.find(path);
 	if (it != modelFilePaths_.end()) {
-		logger_->debug("Model already loaded: {}", filePath);
+		logger_->debug("Model already loaded: {}", path);
 		return it->second;
 	}
 
-	logger_->info("Loading Model: {}", filePath + fileName);
+	logger_->info("Loading Model: {}", path);
 
 	//idの設定
 	int id = -1;
 
 	//Assimp
 	Assimp::Importer importer;
-	std::string path = (filePath + "/" + fileName);
 	const aiScene* scene = nullptr;
 	scene = importer.ReadFile(path.c_str(), aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 	assert(scene && "ModelManager::LoadModel: Failed to load model");
 
 	//読み込み
-	
+
 	bool isSkinningModel = false;
 	for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
 		aiMesh* mesh = scene->mMeshes[m];
@@ -89,21 +87,22 @@ int ModelManager::LoadModel(std::string filePath) {
 		nodeModelDatas_.push_back(result);
 	}
 
-	modelFilePaths_[filePath] = id;
+	modelFilePaths_[path] = id;
 
 	return id;
 }
 
-Animation ModelManager::LoadAnimation(std::string filePath, int index) {
+Animation ModelManager::LoadAnimation(int index, std::string filePath, std::string fileName) {
 
-	std::string fileName = FilePathChecker(filePath);
+	std::string factName = FilePathChecker(filePath, fileName);
+	std::string path = (filePath + "/" + factName);
 
-	auto it = animations_.find(filePath);
+	auto it = animations_.find(path);
 	if (it != animations_.end()) {
-		logger_->debug("Animation already loaded: {}", filePath);
+		logger_->debug("Animation already loaded: {}", path);
 
-		if(it->second.empty()) {
-			logger_->error("No animations found in file: {}", filePath);
+		if (it->second.empty()) {
+			logger_->error("No animations found in file: {}", path);
 			assert(false && "ModelManager::LoadAnimation: No animations found");
 			return Animation{};
 		}
@@ -114,7 +113,6 @@ Animation ModelManager::LoadAnimation(std::string filePath, int index) {
 
 	//Assimp
 	Assimp::Importer importer;
-	std::string path = (filePath + "/" + fileName);
 	const aiScene* scene = nullptr;
 	scene = importer.ReadFile(path.c_str(), aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 	assert(scene && "ModelManager::LoadModel: Failed to load model");
@@ -123,14 +121,14 @@ Animation ModelManager::LoadAnimation(std::string filePath, int index) {
 	auto animations = ModelLoader::LoadAnimations(scene);
 
 	if (animations.empty()) {
-		logger_->error("No animations found in file: {}", filePath);
+		logger_->error("No animations found in file: {}", path);
 		assert(false && "ModelManager::LoadAnimation: No animations found");
 		return Animation{};
 	}
 
-	animations_[filePath] = animations;
+	animations_[path] = animations;
 	index = std::clamp(index, 0, int(animations.size() - 1));
-	return animations_[filePath][index];
+	return animations_[path][index];
 }
 
 NodeModelData& ModelManager::GetNodeModelData(int id) {
@@ -153,7 +151,7 @@ SkinningModelData& ModelManager::GetSkinningModelData(int id) {
 	}
 }
 
-std::string ModelManager::FilePathChecker(std::string& filePath) {
+std::string ModelManager::FilePathChecker(std::string& filePath, std::string fileName) {
 	//Assets/から始まっているか確認(Assets/Modelの可能性もあるのでAssets/のみ確認)
 	std::string formatFirst = "Assets/";
 	std::string factFilePath = "";
@@ -174,7 +172,24 @@ std::string ModelManager::FilePathChecker(std::string& filePath) {
 	filePath = factFilePath;
 
 	std::vector<std::string> extensions = { ".fbx", ".obj", ".gltf", ".glb" };
-	std::string fileName = ExtensionSearcher(filePath, extensions);
+	std::vector<std::string> fileNames = ExtensionSearcher(filePath, extensions);
+
+	if (fileNames.empty()) {
+		return "";
+	}
+
+	if (fileName == "") {
+		std::sort(fileNames.begin(), fileNames.end());
+		return fileNames.front();
+	} else {
+		for (const auto& name : fileNames) {
+			if (name == fileName) {
+				return fileName;
+			}
+		}
+		logger_->warn("File not found: {}, so using {} instead.", fileName, fileNames.front());
+		return fileNames.front();
+	}
 
 	return fileName;
 }
@@ -182,28 +197,18 @@ std::string ModelManager::FilePathChecker(std::string& filePath) {
 NodeModelData ModelManager::WritingNodeModelData(const aiScene* scene, std::string filePath) {
 	NodeModelData result;
 	//コードがごちゃつくのでModelLoaderに処理を投げる
-	result.vertices = ModelLoader::LoadVertices(scene);
-	result.indices = ModelLoader::LoadIndices(scene);
+	result.meshes = ModelLoader::LoadMeshes(scene);
 	result.materials = ModelLoader::LoadMaterials(scene, filePath, textureManager_);
-	result.materialIndex = ModelLoader::LoadMaterialIndices(scene);
 	result.rootNode = ModelLoader::ReadNode(scene->mRootNode);
 
 	//読み込めているかの確認
 	bool isCorrect = true;
-	if (result.vertices.empty()) {
-		logger_->warn("Vertex is Empty!");
-		isCorrect = false;
-	}
-	if (result.indices.empty()) {
-		logger_->warn("Index is Empty!");
+	if (result.meshes.empty()) {
+		logger_->warn("Mesh is Empty!");
 		isCorrect = false;
 	}
 	if (result.materials.empty()) {
 		logger_->warn("Material is Empty!");
-		isCorrect = false;
-	}
-	if (result.materialIndex.empty()) {
-		logger_->warn("MaterialIndex is Empty!");
 		isCorrect = false;
 	}
 
@@ -213,10 +218,15 @@ NodeModelData ModelManager::WritingNodeModelData(const aiScene* scene, std::stri
 		result = nodeModelDatas_[0]; //キューブをセット
 	} else {
 		//DrawDataの作成
-		drawDataManager_->AddVertexBuffer(result.vertices);
-		drawDataManager_->AddIndexBuffer(result.indices);
-		int drawDataIndex = drawDataManager_->CreateDrawData();
-		result.drawDataIndex = drawDataIndex;
+		for (const auto& mesh : result.meshes) {
+			if (mesh.indices.empty()) {
+				continue;
+			}
+			drawDataManager_->AddVertexBuffer(mesh.vertices);
+			drawDataManager_->AddIndexBuffer(mesh.indices);
+			int drawDataIndex = drawDataManager_->CreateDrawData();
+			result.drawDataIndices.push_back(drawDataIndex);
+		}
 	}
 
 	return result;
@@ -285,8 +295,8 @@ Matrix4x4 AnimationUpdate(const Animation& animation, float time, const Node& no
 }
 
 void AnimationUpdate(const Animation& animation, float time, Skeleton& skeleton) {
-	for(Joint& joint : skeleton.joints) {
-		if(auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
+	for (Joint& joint : skeleton.joints) {
+		if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
 			Vector3 position = CalculateValue(it->second.position.keyframes, time);
 			Quaternion rotation = CalculateValue(it->second.rotate.keyframes, time);
 			Vector3 scale = CalculateValue(it->second.scale.keyframes, time);
@@ -315,7 +325,7 @@ void SkinningUpdate(std::vector<WellForGPU>& result, std::map<std::string, Joint
 	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
 		assert(jointIndex < skeleton.joints.size());
 		std::string key = skeleton.joints[jointIndex].name;
-		result[jointIndex].skeletonSpaceMatrix = 
+		result[jointIndex].skeletonSpaceMatrix =
 			skinCluster[key].inverseBindPoseMatrix * skeleton.joints[jointIndex].skeletonSpaceMatrix;
 
 		result[jointIndex].skeletonSpaceInverseTransposeMatrix =
@@ -329,7 +339,7 @@ Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time
 		return keyframes[0].value;
 	}
 
-	for(size_t index = 0; index < keyframes.size() - 1; ++index) {
+	for (size_t index = 0; index < keyframes.size() - 1; ++index) {
 		size_t nextIndex = index + 1;
 
 		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {

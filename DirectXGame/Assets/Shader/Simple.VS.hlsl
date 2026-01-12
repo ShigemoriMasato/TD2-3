@@ -14,14 +14,15 @@ struct VSOutput
 
 cbuffer MatrixBuffer : register(b0)
 {
-    float4x4 wvp;
-}
+    float4x4 world;
+    float4x4 vp;
+};
 
 VSOutput main(VSInput input)
 {
     VSOutput output;
-    output.position = mul(input.position, wvp);
+    output.position = mul(input.position, mul(world, vp));
     output.texCoord = input.texCoord;
-    output.normal = input.normal;
-	return output;
+    output.normal = mul(input.normal, (float3x3) world);
+    return output;
 }

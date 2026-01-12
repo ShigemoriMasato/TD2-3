@@ -27,7 +27,7 @@ public:
 	void WaitForGPU();
 
 	void ImGuiActivate(Window* window);
-	void ImGuiDraw();
+	void DrawImGui();
 
 	TextureManager* GetTextureManager() { return textureManager_.get(); }
 	ModelManager* GetModelManager() { return modelManager_.get(); }

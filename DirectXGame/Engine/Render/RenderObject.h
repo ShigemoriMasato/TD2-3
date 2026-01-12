@@ -15,6 +15,7 @@ public:
 	void Initialize();
 
 	void SetDrawData(const DrawData& data);
+	void SetDrawData(const std::vector<DrawData>& datas);
 	int CreateCBV(size_t size, ShaderType type, std::string debugName = "");
 	int CreateSRV(size_t size, uint32_t num, ShaderType type, std::string debugName = "");
 
@@ -34,9 +35,7 @@ private://static
 
 private://データ管理
 
-	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbv_{};
-	D3D12_INDEX_BUFFER_VIEW ibv_{};
-	uint32_t indexNum_ = 0;
+	std::vector<DrawData> drawData_{};
 
 	struct BufferData {
 		void* mapped = nullptr;

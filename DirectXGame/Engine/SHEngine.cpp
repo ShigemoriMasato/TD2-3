@@ -106,7 +106,7 @@ void SHEngine::EndFrame() {
 	//PostDraw
 	windowMaker_->AllPostDraw();
 	//ImGui
-	ImGuiDraw();
+	DrawImGui();
 	//Execute
 	cmdListManager_->Execute();
 	//Present
@@ -132,7 +132,7 @@ void SHEngine::ImGuiActivate(Window* window) {
 	logger_->info("ImGui activated");
 }
 
-void SHEngine::ImGuiDraw() {
+void SHEngine::DrawImGui() {
 	//ImGui
 	if (imGuiActive_ && !imguiDrawed_) {
 		imGuiForEngine_->EndFrame();

@@ -1,6 +1,8 @@
 #include "Collider.h"
 #include "ColliderManager.h"
 
+ColliderManager* Collider::colliderManager_ = nullptr;
+
 uint32_t operator|(CollTag a, CollTag b) {
     return 0;
 }

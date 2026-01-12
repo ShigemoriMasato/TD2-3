@@ -6,7 +6,7 @@
 using namespace Matrix;
 
 void DebugCamera::Initialize() {
-	center_ = {0.0f, -2.0f, 0.0f};
+	center_ = {0.0f, 2.0f, 0.0f};
 
 	scale_ = Vector3(1.0f, 1.0f, 1.0f);
 	position_= Vector3(0.0f, 0.0f, -20.0f);
@@ -14,7 +14,6 @@ void DebugCamera::Initialize() {
 	spherical_.x = 20.0f;
 	spherical_.y = std::numbers::pi_v<float> / 2;
 	spherical_.z = -std::numbers::pi_v<float> / 2;
-
 }
 
 void DebugCamera::Update() {
@@ -34,7 +33,7 @@ void DebugCamera::Update() {
 
 	if (Input::GetMouseButtonState()[2] || Input::GetKeyState(DIK_LSHIFT)) {
 		float speed = spherical_.x * 0.05f;
-		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * speed * MakeRotationMatrix(rotation_);
+		center_ -= Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * speed * MakeRotationMatrix(rotation_);
 	} else {
 		spherical_ += Vector3(mouseWheel * 0.05f, mouseMove.y * speed_, -mouseMove.x * speed_);
 	}
@@ -52,12 +51,12 @@ void DebugCamera::Update() {
 	//===================
 	//座標の適用
 	//===================
-	SetTransform(MakeTranslationMatrix(center_) * MakeTranslationMatrix(position_).Inverse() * MakeRotationMatrix(rotation_).Inverse() * MakeScaleMatrix(scale_));
+	position_ += center_;
+	SetTransform(MakeTranslationMatrix(position_).Inverse() * MakeRotationMatrix(rotation_).Inverse() * MakeScaleMatrix(scale_));
 	SetProjectionMatrix(PerspectiveFovDesc());
 	MakeMatrix();
 
 	// Actual camera position in world space
-	position_ += center_;
 }
 
 Vector3 DebugCamera::GetCenter() const {

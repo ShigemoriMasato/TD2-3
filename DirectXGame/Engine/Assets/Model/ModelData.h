@@ -11,12 +11,19 @@
 
 struct Material {
 	int textureIndex;
+	int normalTextureIndex = -1;
+	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	Vector4 diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector4 specular = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float shininess = 0.0f;
 };
 
 struct Node {
 	QuaternionTransform transform;
 	Matrix4x4 localMatrix;
 	std::string name;
+	int drawDataIndex = -1;
+	int meshIndex = -1;
 	std::vector<Node> children;
 };
 
@@ -44,18 +51,20 @@ struct Animation {
 	std::unordered_map<std::string, NodeAnimation> nodeAnimations;
 };
 
-struct NodeModelData {
-	//VertexBufferView関連
-	std::vector<VertexData> vertices{};
-	std::vector<uint32_t> materialIndex{};
-
-	//IndexBufferView関連
-	std::vector<uint32_t> indices{};
-
-	//その他
-	Node rootNode{};
-	std::vector<Material> materials{};
+struct Mesh {
 	int drawDataIndex = -1;
+	int materialIndex = -1;
+	std::vector<VertexData> vertices{};
+	std::vector<uint32_t> indices{};
+};
+
+struct NodeModelData {
+	std::vector<Mesh> meshes{};
+
+	std::vector<Material> materials{};
+
+	Node rootNode{};
+	std::vector<int> drawDataIndices{};
 };
 
 struct Joint {

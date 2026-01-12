@@ -9,52 +9,60 @@ namespace {
 }
 
 void TestScene::Initialize() {
-	renderObject_ = std::make_unique<RenderObject>("TestRenderObject");
-	renderObject_->Initialize();
-	renderObject_->psoConfig_.inputLayoutID = InputLayoutID::Skinning;
-	renderObject_->psoConfig_.vs = "Skinning.VS.hlsl";
-	renderObject_->psoConfig_.ps = "White.PS.hlsl";
-
-	int LoadModelID = modelManager_->LoadModel(sneakWalk);
-	auto model = modelManager_->GetSkinningModelData(LoadModelID);
-
-	renderObject_->SetDrawData(drawDataManager_->GetDrawData(model.drawDataIndex));
-
-	vsDataIndex_ = renderObject_->CreateCBV(sizeof(VSData), ShaderType::VERTEX_SHADER, "TestScene::VSData");
-	int jointCount = static_cast<int>(model.skeleton.joints.size());
-	skinningMatrices_.resize(jointCount);
-	renderObject_->CreateSRV(sizeof(WellForGPU), jointCount, ShaderType::VERTEX_SHADER, "TestScene::SkinningMatrices");
-
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();
+	debugCamera_->SetCenter({ 0.0f, 3.0f, 0.0f });
 
-	debugLine_ = std::make_unique<DebugLine>();
-	debugLine_->Initialize(drawDataManager_, modelManager_, debugCamera_.get());
+	sphere_ = std::make_unique<Sphere>();
+	int loadModelID = modelManager_->LoadModel("MonsterBall");
+	auto nodeModel = modelManager_->GetNodeModelData(loadModelID);
+	auto drawData = drawDataManager_->GetDrawData(nodeModel.drawDataIndices);
+	int textureIndex = nodeModel.materials.back().textureIndex;
+	sphere_->Initialize(drawData.front(), debugCamera_.get(), textureIndex);
+
+	simpleRooms_ = std::make_unique<SimpleRooms>();
+	nodeModel = modelManager_->GetNodeModelData(modelManager_->LoadModel("SimpleRoom"));
+	drawData = drawDataManager_->GetDrawData(nodeModel.drawDataIndices);
+	simpleRooms_->Initialize(drawData.front(), debugCamera_.get());
+
+	sneakWalk_ = std::make_unique<SneakWalk>();
+	sneakWalk_->Initialize(modelManager_, drawDataManager_, debugCamera_.get());
+
+	samplerTest_ = std::make_unique<SamplerTest>();
+	samplerTest_->Initialize(modelManager_, drawDataManager_, debugCamera_.get());
+
+	animationTest_ = std::make_unique<AnimationTest>();
+	animationTest_->Initialize(modelManager_, drawDataManager_, debugCamera_.get());
+
+	animationMiscTest_ = std::make_unique<AnimationMiscTest>();
+	animationMiscTest_->Initialize(modelManager_, drawDataManager_, debugCamera_.get());
+
+	spotLightTest_ = std::make_unique<SpotLightTest>();
+	nodeModel = modelManager_->GetNodeModelData(modelManager_->LoadModel("MonsterBall"));
+	drawData = drawDataManager_->GetDrawData(nodeModel.drawDataIndices);
+	spotLightTest_->Initialize(drawData.front(), debugCamera_.get());
+
+	labels_ = {
+		"Sphere + Reflection",
+		"Skinning + Multi PointLight",
+		"Sampler Test",
+		"Animation Test",
+		"Animation Misc Test(Unfinished)",
+		"Multi SpotLight Test",
+	};
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
 	input_->Update();
-	debugLine_->Fresh();
-
 	debugCamera_->Update();
 
-	static Animation animation = modelManager_->LoadAnimation(sneakWalk, 0);
-	static auto model = modelManager_->GetSkinningModelData(modelManager_->LoadModel(sneakWalk));
+	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
 
-	static float time = 0.0f;
-	time += engine_->GetFPSObserver()->GetDeltatime();
-	time = std::fmod(time, animation.duration);
+	sneakWalk_->Update(deltaTime);
 
-	AnimationUpdate(animation, time, model.skeleton);
-	SkeletonUpdate(model.skeleton);
-	SkinningUpdate(skinningMatrices_, model.skinClusterData, model.skeleton);
+	animationTest_->Update(deltaTime);
 
-	vsData_.worldMatrix = Matrix4x4::Identity();
-	vsData_.vpMatrix = debugCamera_->GetVPMatrix();
-	renderObject_->CopyBufferData(vsDataIndex_, &vsData_, sizeof(VSData));
-	renderObject_->CopyBufferData(1, skinningMatrices_.data(), sizeof(WellForGPU) * skinningMatrices_.size());
-
-	debugLine_->AddLine(model.skeleton, 2.0f);
+	animationMiscTest_->Update(deltaTime);
 
 	return nullptr;
 }
@@ -64,12 +72,53 @@ void TestScene::Draw() {
 	auto display = commonData_->display.get();
 
 	display->PreDraw(window->GetCommandList(), true);
-	renderObject_->Draw(window->GetWindow());
-	debugLine_->Draw(window->GetWindow());
+	simpleRooms_->Draw(window->GetWindow());
+	sneakWalk_->Draw(window->GetWindow());
+	sphere_->Draw(window->GetWindow());
+	animationTest_->Draw(window->GetWindow());
+	animationMiscTest_->Draw(window->GetWindow());
+	samplerTest_->Draw(window->GetWindow());
+	spotLightTest_->Draw(window->GetWindow());
 	display->PostDraw(window->GetCommandList());
 
 	window->PreDraw();
 	window->PostDraw();
 	//ImGui
-	engine_->ImGuiDraw();
+#ifdef USE_IMGUI
+	ImGui::Begin("TestScene");
+	for (int i = 0; i < labels_.size(); ++i) {
+		if (ImGui::RadioButton(labels_[i].c_str(), &editIndex_, i)) {
+			editIndex_ = i;
+			debugCamera_->Initialize();
+			debugCamera_->SetCenter({ 7.0f * float(i), 3.0f, 0.0f});
+			break;
+		}
+	}
+	ImGui::End();
+
+	simpleRooms_->DrawImGui();
+
+	switch (editIndex_) {
+	case 0:
+		sphere_->DrawImGui();
+		break;
+	case 1:
+		sneakWalk_->DrawImGui();
+		break;
+	case 2:
+		samplerTest_->DrawImGui();
+		break;
+	case 3:
+		animationTest_->DrawImGui();
+		break;
+	case 4:
+		animationMiscTest_->DrawImGui();
+		break;
+	case 5:
+		spotLightTest_->DrawImGui();
+		break;
+	}
+#endif
+
+	engine_->DrawImGui();
 }

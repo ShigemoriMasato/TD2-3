@@ -16,6 +16,19 @@ struct PointLight
     float2 pad;
 };
 
+struct SpotLight
+{
+    float4 color;
+    float3 position;
+    float intensity;
+    float3 direction;
+    float distance;
+    float decay;
+    float cosAngle;
+    float attenuation;
+    float falloffStart;
+};
+
 float PointLightAttenuation(float3 lightPos, float3 objPos, float radius, float decay, float intensity)
 {
     float distance = length(lightPos - objPos);
@@ -46,17 +59,3 @@ float4 LambertReflectance(float3 normal, float4 color, float4 lightColor, float3
     return outputColor;
 }
 
-
-float4 PhongReflection(float3 cameraPos, float3 objPos, float3 lightDir, float normal, float shininess, float4 objColor, float4 lightedColor, float4 lightColor)
-{
-    float4 toEye = normalize(cameraPos - objPos);
-    
-    float4 reflectLight = reflect(lightDir, normalize(normal));
-    
-    float RdotE = dot(reflectLight, toEye);
-    float specular = pow(saturate(RdotE), shininess);
-    
-    float3 specularColor = objColor * specular * lightColor;
-    
-    return float4(lightedColor.rgb + specularColor, lightedColor.w);
-}

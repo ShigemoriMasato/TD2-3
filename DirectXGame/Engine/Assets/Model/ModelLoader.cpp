@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 #include <Utility/MatrixFactory.h>
+#include <Utility/Color.h>
 
 Node ModelLoader::ReadNode(const aiNode* node) {
 	Node result;
@@ -21,6 +22,9 @@ Node ModelLoader::ReadNode(const aiNode* node) {
 	// Node名を格納
 	result.name = node->mName.C_Str();
 
+	//メッシュインデックスの格納（複数ある場合は最初のものを使う）
+	result.meshIndex = (node->mNumMeshes > 0) ? node->mMeshes[0] : -1;
+
 	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
 		//再帰的に読んで階層構造を作っていく
 		result.children.push_back(ReadNode(node->mChildren[childIndex]));
@@ -29,11 +33,52 @@ Node ModelLoader::ReadNode(const aiNode* node) {
 	return result;
 }
 
+std::vector<Mesh> ModelLoader::LoadMeshes(const aiScene* scene) {
+	std::vector<Mesh> meshes;
+	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
+		aiMesh* ai_mesh = scene->mMeshes[mesh];
+		Mesh meshData{};
+		//頂点データの読み込み
+		for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+			VertexData vertex{};
+			//位置
+			vertex.position.x = ai_mesh->mVertices[v].x;
+			vertex.position.y = ai_mesh->mVertices[v].y;
+			vertex.position.z = ai_mesh->mVertices[v].z;
+			vertex.position.w = 1.0f;
+			//法線
+			if (ai_mesh->HasNormals()) {
+				vertex.normal.x = ai_mesh->mNormals[v].x;
+				vertex.normal.y = ai_mesh->mNormals[v].y;
+				vertex.normal.z = ai_mesh->mNormals[v].z;
+			}
+			//UV
+			if (ai_mesh->HasTextureCoords(0)) {
+				vertex.texcoord.x = ai_mesh->mTextureCoords[0][v].x;
+				vertex.texcoord.y = ai_mesh->mTextureCoords[0][v].y;
+			}
+			meshData.vertices.push_back(vertex);
+		}
+		//インデックスデータの読み込み
+		for (uint32_t f = 0; f < ai_mesh->mNumFaces; ++f) {
+			aiFace& face = ai_mesh->mFaces[f];
+			for (uint32_t i = 0; i < face.mNumIndices; ++i) {
+				meshData.indices.push_back(face.mIndices[i]);
+			}
+		}
+		meshData.materialIndex = ai_mesh->mMaterialIndex;
+		meshes.push_back(meshData);
+	}
+
+	return meshes;
+}
+
 std::vector<VertexData> ModelLoader::LoadVertices(const aiScene* scene) {
 	std::vector<VertexData> vertices;
 
-	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
-		aiMesh* ai_mesh = scene->mMeshes[mesh];
+	for(uint32_t node = 0; node < scene->mNumMeshes; ++node) {
+		aiMesh* ai_mesh = scene->mMeshes[node];
+
 		for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
 			VertexData vertex{};
 			//位置
@@ -124,6 +169,34 @@ std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::stri
 			material.textureIndex = textureManager->LoadTexture(directoryPath + "/" + path);
 		} else {
 			material.textureIndex = 0; //テクスチャが無い場合はデフォルトテクスチャを使う
+		}
+
+		aiString normalTexturePath;
+		if (ai_material->GetTexture(aiTextureType_NORMALS, 0, &normalTexturePath) == AI_SUCCESS) {
+			std::string path = normalTexturePath.C_Str();
+			material.normalTextureIndex = textureManager->LoadTexture(directoryPath + "/" + path);
+		} else {
+			material.normalTextureIndex = -1; //法線マップが無い場合
+		}
+
+		aiColor4D baseColor{};
+		if (ai_material->Get(AI_MATKEY_BASE_COLOR, baseColor) == AI_SUCCESS) {
+			material.color = { baseColor.r, baseColor.g, baseColor.b, baseColor.a };
+		}
+
+		aiColor4D diffuseColor{};
+		if (ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS) {
+			material.color = { diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a };
+		}
+
+		aiColor4D specularColor{};
+		if (ai_material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor) == AI_SUCCESS) {
+			material.specular = { specularColor.r, specularColor.g, specularColor.b, specularColor.a };
+		}
+
+		float shininess = 0.f;
+		if (ai_material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
+			material.shininess = shininess;
 		}
 
 		materials.push_back(material);

@@ -64,3 +64,14 @@ int DrawDataManager::CreateDrawData() {
 
 	return static_cast<int>(drawDatas_.size() - 1);
 }
+
+std::vector<DrawData> DrawDataManager::GetDrawData(const std::vector<int>& indices) const {
+	std::vector<DrawData> result;
+
+	for(const auto& index : indices) {
+		assert(index >= 0 && index < static_cast<int>(drawDatas_.size()) && "DrawDataManager::GetDrawData: Invalid DrawData index");
+		result.push_back(drawDatas_[index].first);
+	}
+
+	return result;
+}

@@ -7,6 +7,7 @@ Logger RenderObject::logger_ = getLogger("Engine");
 
 RenderObject::RenderObject(std::string debugName) {
 	debugName_ = debugName == "" ? "NoName" : debugName;
+	drawData_.reserve(4);
 	logger_->debug("RenderObject Created: {}", debugName_);
 }
 
@@ -25,10 +26,14 @@ void RenderObject::Initialize() {
 }
 
 void RenderObject::SetDrawData(const DrawData& data) {
-	vbv_ = data.vbv;
-	ibv_ = data.ibv;
-	indexNum_ = data.indexNum;
+	drawData_.clear();
+	drawData_.push_back(data);
 	logger_->debug("Draw Data Set: {}", debugName_);
+}
+
+void RenderObject::SetDrawData(const std::vector<DrawData>& datas) {
+	drawData_ = datas;
+	logger_->debug("Draw Data Set: {} ({} sets)", debugName_, datas.size());
 }
 
 int RenderObject::CreateCBV(size_t size, ShaderType type, std::string debugName) {
@@ -136,44 +141,55 @@ void RenderObject::CopyBufferData(int index, const void* data, size_t size) {
 }
 
 void RenderObject::Draw(Window* window) {
-	//描画できる状態か確認
-	if (vbv_.size() == 0) {
-		logger_->error("=========== Draw || No vertex buffer set ===========");
+
+	if (drawData_.empty()) {
+		logger_->error("=========== Draw || No draw data set ===========");
 		logger_->error("  RenderObject: {}", debugName_);
-		assert(false && "RenderObject::Draw: No vertex buffer set");
-		return;
-	}
-	if (ibv_.BufferLocation == 0) {
-		logger_->error("=========== Draw || No index buffer set ===========");
-		logger_->error("  RenderObject: {}", debugName_);
-		assert(false && "RenderObject::Draw: No index buffer set");
+		assert(false && "RenderObject::Draw: No draw data set");
 		return;
 	}
 
-	auto cmdList = window->GetCommandObject()->GetCommandList();
+	for (const auto& data : drawData_) {
 
-	//パイプラインステートの設定
-	device_->SetPSO(cmdList, psoConfig_);
+		//描画できる状態か確認
+		if (data.vbv.size() == 0) {
+			logger_->error("=========== Draw || No vertex buffer set ===========");
+			logger_->error("  RenderObject: {}", debugName_);
+			assert(false && "RenderObject::Draw: No vertex buffer set");
+			return;
+		}
+		if (data.ibv.BufferLocation == 0) {
+			logger_->error("=========== Draw || No index buffer set ===========");
+			logger_->error("  RenderObject: {}", debugName_);
+			assert(false && "RenderObject::Draw: No index buffer set");
+			return;
+		}
 
-	//頂点バッファの設定
-	cmdList->IASetVertexBuffers(0, UINT(vbv_.size()), vbv_.data());
-	cmdList->IASetIndexBuffer(&ibv_);
+		auto cmdList = window->GetCommandObject()->GetCommandList();
 
-	//bufferの設定
-	UINT rootIndex = 0;
-	for (size_t i = 0; i < cbvAddresses_.size(); ++i) {
-		cmdList->SetGraphicsRootConstantBufferView(rootIndex++, cbvAddresses_[i][index_]);
+		//パイプラインステートの設定
+		device_->SetPSO(cmdList, psoConfig_);
+
+		//頂点バッファの設定
+		cmdList->IASetVertexBuffers(0, UINT(data.vbv.size()), data.vbv.data());
+		cmdList->IASetIndexBuffer(&data.ibv);
+
+		//bufferの設定
+		UINT rootIndex = 0;
+		for (size_t i = 0; i < cbvAddresses_.size(); ++i) {
+			cmdList->SetGraphicsRootConstantBufferView(rootIndex++, cbvAddresses_[i][index_]);
+		}
+		for (size_t i = 0; i < srvHandles_.size(); ++i) {
+			cmdList->SetGraphicsRootDescriptorTable(rootIndex++, srvHandles_[i][index_]->GetGPU());
+		}
+		if (psoConfig_.rootConfig.useTexture) {
+			auto textureHandle = device_->GetSRVManager()->GetStartPtr();
+			cmdList->SetGraphicsRootDescriptorTable(rootIndex++, textureHandle);
+		}
+
+		//描画コマンド
+		cmdList->DrawIndexedInstanced(data.indexNum, instanceNum_, 0, 0, 0);
 	}
-	for (size_t i = 0; i < srvHandles_.size(); ++i) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, srvHandles_[i][index_]->GetGPU());
-	}
-	if (psoConfig_.rootConfig.useTexture) {
-		auto textureHandle = device_->GetSRVManager()->GetStartPtr();
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, textureHandle);
-	}
-
-	//描画コマンド
-	cmdList->DrawIndexedInstanced(indexNum_, instanceNum_, 0, 0, 0);
 }
 
 void RenderObject::SetUseTexture(bool useTexture) {

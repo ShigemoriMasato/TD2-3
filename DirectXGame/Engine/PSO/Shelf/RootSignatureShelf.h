@@ -8,10 +8,23 @@
 
 enum class SamplerID : uint32_t {
 	Non = 0,
-	Static = 1 << 0,
-	Clamp = 1 << 1,
+	Default = 1 << 0,
+	ClampT = 1 << 1,
+	MirrorT = 1 << 2,
+	ClampS = 1 << 3,
+	MirrorS = 1 << 4,
 
-	Count
+	MagNearest = 1 << 5,
+	MagLinear = 1 << 6,
+
+	MinNearest = 1 << 7,
+	MinLinear = 1 << 8,
+	MinNearestMipmapNearest = 1 << 9,
+	MinLinearMipmapNearest = 1 << 10,
+	MinNearestMipmapLinear = 1 << 11,
+	MinLinearMipmapLinear = 1 << 12,
+
+	ClampClamp_MinMagNearest = 1 << 13,
 };
 
 uint32_t operator|(SamplerID a, SamplerID b);
@@ -22,7 +35,7 @@ struct RootSignatureConfig {
 	std::pair<int, int> cbvNums{};							// <Vertex, Pixel>
 	std::pair<int, int> srvNums{};							// <Vertex, Pixel> 上限8
 	bool useTexture = false;								// テクスチャを使うか
-	uint32_t samplers = uint32_t(SamplerID::Static);		//SamplerIDのビットマスク
+	uint32_t samplers = uint32_t(SamplerID::Default);		//SamplerIDのビットマスク
 
 	bool operator<(const RootSignatureConfig& other) const;
 	bool operator==(const RootSignatureConfig& other) const;

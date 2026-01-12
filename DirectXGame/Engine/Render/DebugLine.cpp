@@ -1,8 +1,8 @@
 #include "DebugLine.h"
 
 void DebugLine::Initialize(DrawDataManager* manager, ModelManager* modelManager, Camera* camera) {
-	DrawData cube = manager->GetDrawData(modelManager->GetNodeModelData(0).drawDataIndex);
-	DrawData sphere = manager->GetDrawData(modelManager->GetNodeModelData(2).drawDataIndex);
+	auto cube = manager->GetDrawData(modelManager->GetNodeModelData(0).drawDataIndices);
+	auto sphere = manager->GetDrawData(modelManager->GetNodeModelData(2).drawDataIndices);
 
 	sphere_ = std::make_unique<RenderObject>("DebugLine::Sphere");
 	sphere_->Initialize();

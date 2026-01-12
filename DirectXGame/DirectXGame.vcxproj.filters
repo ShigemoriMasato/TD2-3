@@ -63,6 +63,13 @@
     <ClCompile Include="AppSource\Common\Camera\GameCamera.cpp" />
     <ClCompile Include="Engine\Collision\Collider.cpp" />
     <ClCompile Include="Engine\Collision\ColliderManager.cpp" />
+    <ClCompile Include="AppSource\Test\Sphere.cpp" />
+    <ClCompile Include="AppSource\Test\SimpleRooms.cpp" />
+    <ClCompile Include="AppSource\Test\SneakWalk.cpp" />
+    <ClCompile Include="AppSource\Test\SamplerTest.cpp" />
+    <ClCompile Include="AppSource\Test\AnimationTest.cpp" />
+    <ClCompile Include="AppSource\Test\AnimationMiscTest.cpp" />
+    <ClCompile Include="AppSource\Test\SpotLightTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\DXDevice.h" />
@@ -144,5 +151,12 @@
     <ClInclude Include="Engine\Collision\Collider.h" />
     <ClInclude Include="Engine\Collision\ColliderManager.h" />
     <ClInclude Include="Engine\Collision\Data\CollisionInfo.h" />
+    <ClInclude Include="AppSource\Test\Sphere.h" />
+    <ClInclude Include="AppSource\Test\SimpleRooms.h" />
+    <ClInclude Include="AppSource\Test\SneakWalk.h" />
+    <ClInclude Include="AppSource\Test\SamplerTest.h" />
+    <ClInclude Include="AppSource\Test\AnimationTest.h" />
+    <ClInclude Include="AppSource\Test\AnimationMiscTest.h" />
+    <ClInclude Include="AppSource\Test\SpotLightTest.h" />
   </ItemGroup>
 </Project>

@@ -19,8 +19,9 @@ public:
 
 	void Initialize(TextureManager* textureManager, DrawDataManager* drawDataManager);
 
-	int LoadModel(std::string filePath);
-	Animation LoadAnimation(std::string filePath, int index);
+	//ファイル名が未記入の場合は、辞書順で一番若いものが選ばれる
+	int LoadModel(std::string filePath, std::string fileName = "");
+	Animation LoadAnimation(int index, std::string filePath, std::string fileName = "");
 
 	//失敗したらLogとキューブが返る
 	NodeModelData& GetNodeModelData(int id);
@@ -29,7 +30,7 @@ public:
 
 private:
 
-	std::string FilePathChecker(std::string& filePath);
+	std::string FilePathChecker(std::string& filePath, std::string fileName = "");
 
 	NodeModelData WritingNodeModelData(const aiScene* scene, std::string filePath);
 	SkinningModelData WritingSkinningModelData(const aiScene* scene, std::string filePath);
