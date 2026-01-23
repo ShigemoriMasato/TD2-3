@@ -25,6 +25,7 @@ void Sphere::Initialize(DrawData& drawData, Camera* camera, int textureIndex) {
 void Sphere::Draw(Window* window) {
 	vsData_.world = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
 	vsData_.vp = camera_->GetVPMatrix();
+	vsData_.worldInv = vsData_.world.Inverse().Transpose();
 
 	psData_.cameraPos = camera_->position_;
 

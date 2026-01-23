@@ -7,7 +7,6 @@
 
 #include <cassert>
 
-#include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
 namespace {
@@ -122,7 +121,6 @@ Animation ModelManager::LoadAnimation(int index, std::string filePath, std::stri
 
 	if (animations.empty()) {
 		logger_->error("No animations found in file: {}", path);
-		assert(false && "ModelManager::LoadAnimation: No animations found");
 		return Animation{};
 	}
 
@@ -288,6 +286,9 @@ SkinningModelData ModelManager::WritingSkinningModelData(const aiScene* scene, s
 }
 
 Matrix4x4 AnimationUpdate(const Animation& animation, float time, const Node& node) {
+	if(animation.nodeAnimations.find(node.name) == animation.nodeAnimations.end()){
+		return node.localMatrix;
+	}
 	Vector3 position = CalculateValue(animation.nodeAnimations.at(node.name).position.keyframes, time);
 	Quaternion rotation = CalculateValue(animation.nodeAnimations.at(node.name).rotate.keyframes, time);
 	Vector3 scale = CalculateValue(animation.nodeAnimations.at(node.name).scale.keyframes, time);

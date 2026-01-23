@@ -48,11 +48,15 @@ void AnimationMiscTest::Update(float deltaTime) {
 		return;
 	}
 	timer_ += deltaTime;
-	timer_ = std::fmod(timer_, currentAnimation_->duration);
+	if (currentAnimation_->duration > 0.0f) {
+		timer_ = std::fmod(timer_, currentAnimation_->duration);
+	} else {
+		timer_ = 0.0f;
+	}
 
 	auto& model = nodeModels_[currentAnimationIndex_];
-
-	vsData_.world = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
+	Matrix4x4 animationMat = AnimationUpdate(*currentAnimation_, timer_, model.rootNode);
+	vsData_.world = animationMat * Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
 }
 
 void AnimationMiscTest::Draw(Window* window) {
@@ -78,13 +82,15 @@ void AnimationMiscTest::DrawImGui() {
 	ImGui::PushID(0);
 	if (ImGui::Button("-")) {
 		currentAnimationIndex_ = std::max(0, currentAnimationIndex_ - 1);
+		timer_ = 0.0f;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("+")) {
 		currentAnimationIndex_ = std::min(static_cast<int>(animations_.size()) - 1, currentAnimationIndex_ + 1);
+		timer_ = 0.0f;
 	}
 	ImGui::PopID();
-	ImGui::Text("Sub Animation : %d", currentSubAnimationIndex_);
+	ImGui::Text("(Sub Animation) : %d", currentSubAnimationIndex_);
 	ImGui::PushID(1);
 	ImGui::SameLine();
 	if (ImGui::Button("-")) {

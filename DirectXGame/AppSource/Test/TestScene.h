@@ -8,6 +8,7 @@
 #include <Test/AnimationTest.h>
 #include <Test/AnimationMiscTest.h>
 #include <Test/SpotLightTest.h>
+#include <Test/SkinningTest.h>
 
 class TestScene : public IScene {
 public:
@@ -30,7 +31,10 @@ private:
 	std::unique_ptr<AnimationTest> animationTest_;
 	std::unique_ptr<AnimationMiscTest> animationMiscTest_;
 	std::unique_ptr<SpotLightTest> spotLightTest_;
+	std::unique_ptr<SkinningTest> skinningTest_;
 
 	std::vector<std::string> labels_;
 	int editIndex_ = 0;
+	float timeRatio_ = 1.0f;
+	int maxFPS_ = 60;
 };

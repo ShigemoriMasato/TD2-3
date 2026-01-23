@@ -30,6 +30,7 @@ private:
 
 	Transform transform_{};
 	float time = 0.0f;
+	float slideTime_ = 0.0f;
 
 	struct PointLight {
 		Vector4 color;

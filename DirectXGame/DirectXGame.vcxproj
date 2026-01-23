@@ -222,6 +222,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Test\SneakWalk.cpp" />
     <ClCompile Include="AppSource\Test\SamplerTest.cpp" />
     <ClCompile Include="AppSource\Test\SpotLightTest.cpp" />
+    <ClCompile Include="AppSource\Test\SkinningTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Test\AnimationMiscTest.h" />
@@ -310,6 +311,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Test\SneakWalk.h" />
     <ClInclude Include="AppSource\Test\SamplerTest.h" />
     <ClInclude Include="AppSource\Test\SpotLightTest.h" />
+    <ClInclude Include="AppSource\Test\SkinningTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

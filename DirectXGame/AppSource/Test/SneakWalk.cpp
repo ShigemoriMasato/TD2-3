@@ -26,8 +26,11 @@ void SneakWalk::Initialize(ModelManager* modelManager, DrawDataManager* drawData
 }
 
 void SneakWalk::Update(float deltaTime) {
+	slideTime_ += deltaTime;
+	slideTime_ = std::fmod(slideTime_, 3.1415926535f * 4.f);
+
 	//定数バッファ更新
-	vsData_.worldMatrix = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
+	vsData_.worldMatrix = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position + Vector3(std::sin(slideTime_ / 2.f) * 2, 0.f, 0.f));
 	vsData_.vpMatrix = camera_->GetVPMatrix();
 
 	time += deltaTime;

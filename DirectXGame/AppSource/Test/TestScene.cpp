@@ -38,9 +38,11 @@ void TestScene::Initialize() {
 	animationMiscTest_->Initialize(modelManager_, drawDataManager_, debugCamera_.get());
 
 	spotLightTest_ = std::make_unique<SpotLightTest>();
-	nodeModel = modelManager_->GetNodeModelData(modelManager_->LoadModel("MonsterBall"));
-	drawData = drawDataManager_->GetDrawData(nodeModel.drawDataIndices);
+	drawData = drawDataManager_->GetDrawData(modelManager_->GetNodeModelData(1).drawDataIndices);
 	spotLightTest_->Initialize(drawData.front(), debugCamera_.get());
+
+	skinningTest_ = std::make_unique<SkinningTest>();
+	skinningTest_->Initialize(modelManager_, drawDataManager_, debugCamera_.get());
 
 	labels_ = {
 		"Sphere + Reflection",
@@ -48,7 +50,8 @@ void TestScene::Initialize() {
 		"Sampler Test",
 		"Animation Test",
 		"Animation Misc Test(Unfinished)",
-		"Multi SpotLight Test",
+		"Multi SpotLight Test + Plane.obj",
+		"Skinning Test(Unfinished)",
 	};
 }
 
@@ -56,13 +59,15 @@ std::unique_ptr<IScene> TestScene::Update() {
 	input_->Update();
 	debugCamera_->Update();
 
-	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
+	float deltaTime = engine_->GetFPSObserver()->GetDeltatime() * timeRatio_;
 
 	sneakWalk_->Update(deltaTime);
 
 	animationTest_->Update(deltaTime);
 
 	animationMiscTest_->Update(deltaTime);
+
+	skinningTest_->Update(deltaTime);
 
 	return nullptr;
 }
@@ -79,6 +84,7 @@ void TestScene::Draw() {
 	animationMiscTest_->Draw(window->GetWindow());
 	samplerTest_->Draw(window->GetWindow());
 	spotLightTest_->Draw(window->GetWindow());
+	skinningTest_->Draw(window->GetWindow());
 	display->PostDraw(window->GetCommandList());
 
 	window->PreDraw();
@@ -117,8 +123,20 @@ void TestScene::Draw() {
 	case 5:
 		spotLightTest_->DrawImGui();
 		break;
+	case 6:
+		skinningTest_->DrawImGui();
+		break;
 	}
 #endif
+
+	ImGui::Begin("Time");
+	ImGui::DragFloat("Time Ratio", &timeRatio_, 0.01f, 0.0f);
+	ImGui::End();
+	ImGui::Begin("FPS");
+	ImGui::DragInt("Max FPS", &maxFPS_, 1, 1, 240);
+	ImGui::End();
+
+	engine_->GetFPSObserver()->SetTargetFPS(double(maxFPS_));
 
 	engine_->DrawImGui();
 }

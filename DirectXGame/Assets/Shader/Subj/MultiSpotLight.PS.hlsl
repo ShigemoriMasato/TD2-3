@@ -23,7 +23,7 @@ PSOutput main(VSOutput input)
     float4 color = float4(0.5f, 0.5f, 0.5f, 1.0f);
     
     const int lightCount = 4;
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < lightCount; ++i)
     {
         SpotLight light = spotLights[i];
         
@@ -32,7 +32,7 @@ PSOutput main(VSOutput input)
         
         float3 direction = normalize(input.worldPos - light.position);
         float cosAngle = dot(direction, normalize(light.direction));
-        float falloff = saturate((cosAngle - light.cosAngle) / (light.falloffStart - light.cosAngle));
+        float falloff = saturate(-(cosAngle - light.cosAngle) / (light.falloffStart - light.cosAngle));
         
         output.color += HalfLambert(input.normal, color, light.color, light.direction, light.intensity * falloff);
     }

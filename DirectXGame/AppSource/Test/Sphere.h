@@ -37,6 +37,7 @@ private:
 	struct VSData {
 		Matrix4x4 world;
 		Matrix4x4 vp;
+		Matrix4x4 worldInv;
 	};
 
 	PSData psData_{};

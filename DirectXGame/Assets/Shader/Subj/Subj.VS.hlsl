@@ -17,6 +17,7 @@ cbuffer MatrixBuffer : register(b0)
 {
     float4x4 world;
     float4x4 vp;
+    float4x4 worldInv;
 }
 
 VSOutput main(VSInput input)
@@ -25,7 +26,7 @@ VSOutput main(VSInput input)
     float4x4 wvp = mul(world, vp);
     output.position = mul(input.position, wvp);
     output.texCoord = input.texCoord;
-    output.normal = mul(input.normal, (float3x3) world);
+    output.normal = mul(input.normal, (float3x3) worldInv);
     output.worldPos = mul(input.position, world).xyz;
     return output;
 }

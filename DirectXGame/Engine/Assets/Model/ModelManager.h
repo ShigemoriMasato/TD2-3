@@ -6,6 +6,7 @@
 #include <assimp/scene.h>
 #include <Tool/Logger/Logger.h>
 #include <Render/DrawDataManager.h>
+#include <assimp/Importer.hpp>
 
 #include "ModelData.h"
 
@@ -46,6 +47,7 @@ private://Model
 
 	TextureManager* textureManager_;
 	DrawDataManager* drawDataManager_;
+
 
 private://Animation
 
