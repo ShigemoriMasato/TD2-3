@@ -20,7 +20,8 @@ PSOutput main(VSOutput input)
     PSOutput output;
     
     //Gray
-    float4 color = float4(0.5f, 0.5f, 0.5f, 1.0f);
+    output.color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float4 lightedColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
     
     const int lightCount = 4;
     for (int i = 0; i < lightCount; ++i)
@@ -34,10 +35,10 @@ PSOutput main(VSOutput input)
         float cosAngle = dot(direction, normalize(light.direction));
         float falloff = saturate(-(cosAngle - light.cosAngle) / (light.falloffStart - light.cosAngle));
         
-        output.color += HalfLambert(input.normal, color, light.color, light.direction, light.intensity * falloff);
+        lightedColor += HalfLambert(input.normal, output.color, light.color, light.direction, light.intensity * falloff);
     }
     
-    output.color.w = 1.0f;
+    output.color = lightedColor;
     
     return output;
 }

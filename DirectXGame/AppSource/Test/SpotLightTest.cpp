@@ -6,7 +6,7 @@ void SpotLightTest::Initialize(DrawData& drawData, Camera* camera) {
 	renderObject_->Initialize();
 	renderObject_->SetDrawData(drawData);
 	renderObject_->psoConfig_.ps = "Subj/MultiSpotLight.PS.hlsl";
-	renderObject_->psoConfig_.vs = "Subj/Subj.VS.hlsl";
+	renderObject_->psoConfig_.vs = "Subj/Simple.VS.hlsl";
 	renderObject_->CreateCBV(sizeof(VSData), ShaderType::VERTEX_SHADER, "SpotLightTest VSData CBV");
 	renderObject_->CreateSRV(sizeof(SpotLight), 4, ShaderType::PIXEL_SHADER, "SpotLightTest PSData SRV");
 
