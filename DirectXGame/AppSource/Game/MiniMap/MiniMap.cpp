@@ -67,7 +67,7 @@ void MiniMap::Update() {
 	auto prekey = Input::GetPreKeyState();
 
 	//特定のキーが押されたらモードを切り替える
-	if ((key[DIK_TAB] && !prekey[DIK_TAB]) || (key[DIK_M] && prekey[DIK_M]) || key[DIK_F4] && key[DIK_F4]) {
+	if ((key[DIK_TAB] && !prekey[DIK_TAB]) || (key[DIK_M] && prekey[DIK_M]) || (key[DIK_F4] && !prekey[DIK_F4])) {
 		pleasePose_ = !pleasePose_;
 	}
 }
