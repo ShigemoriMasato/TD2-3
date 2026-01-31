@@ -84,3 +84,20 @@ void FontObject::UpdateCharPositions(const std::wstring& text,FontLoader* fontLo
 		charPositions_.push_back(charPos);
 	}
 }
+
+void FontObject::UpdateCharPositionsAndFont(const std::string& fontName, const std::wstring& text, FontLoader* fontLoader) {
+	charPositions_.clear();
+
+	// テキストを設定
+	text_ = text;
+	fontName_ = fontName;
+
+	// フォントの読み込み
+	textureIndex_ = fontLoader->Load(fontName_);
+
+	// テキストを更新
+	for (const wchar_t& c : text_) {
+		CharPosition charPos = fontLoader->GetCharPosition(fontName_, c, 64);
+		charPositions_.push_back(charPos);
+	}
+}

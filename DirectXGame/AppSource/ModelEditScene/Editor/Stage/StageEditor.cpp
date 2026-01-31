@@ -101,6 +101,7 @@ void StageEditor::Save() {
 		}
 	}
 
+	binaryManager_.Write(saveFileName_);
 }
 
 void StageEditor::Load() {

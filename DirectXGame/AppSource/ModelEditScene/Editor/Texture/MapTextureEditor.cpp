@@ -15,9 +15,6 @@ void MapTextureEditor::Initialize(TextureManager* textureManager, Input* input) 
 
 void MapTextureEditor::Update() {
 	someSelected_ = false;
-	if (!editing_) {
-		return;
-	}
 
 	//resize
 	fieldData_.resize(height_);
@@ -27,6 +24,10 @@ void MapTextureEditor::Update() {
 	saveData_[currentStage_].resize(height_);
 	for (auto& row : saveData_[currentStage_]) {
 		row.resize(width_);
+	}
+
+	if (!editing_) {
+		return;
 	}
 
 	//クリックされたら変更

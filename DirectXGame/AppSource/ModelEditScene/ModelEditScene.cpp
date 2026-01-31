@@ -177,6 +177,7 @@ void ModelEditScene::Draw() {
 		textureEditor_->TextureSave();
 		textureEditor_->MapSave();
 		decorationEditor_->Save();
+		stageEditor_->Save();
 	}
 	ImGui::End();
 

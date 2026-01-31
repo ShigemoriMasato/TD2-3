@@ -16,6 +16,17 @@ void TimerUI::Initialize(const std::string& fontName, DrawData drawData, FontLoa
 
 void TimerUI::Update() {
 
+	// 桁を求める
+	digits_ = 0;
+	int n = std::abs(TimeLimit::totalSeconds);
+	do {
+		digits_++;
+		n /= 10;
+	} while (n != 0);
+
+	numFont_->transform_.scale = size_;
+	numFont_->transform_.position = pos_;
+
 	// 時間文字の更新処理
 	numFont_->UpdateCharPositions(std::to_wstring(TimeLimit::totalSeconds), fontLoader_);
 
@@ -45,27 +56,27 @@ void TimerUI::Animation() {
 	if (timer_ <= 0.5f) {
 		float localT = timer_ / 0.5f;
 
-		// 座標
-		numFont_->transform_.position.x = lerp(pos_.x, pos_.x - (32.0f * 0.5f), localT, EaseType::EaseInCubic);
-
 		// スケール
-		float width = lerp(1.0f, 1.5f, localT, EaseType::EaseInCubic);
-		numFont_->transform_.scale.x = width;
-		numFont_->transform_.scale.y = -width;
+		float width = lerp(0.0f, 0.5f, localT, EaseType::EaseInCubic);
+		numFont_->transform_.scale.x = size_.x + width;
+		numFont_->transform_.scale.y = size_.y - width;
 		// フォントの色
 		numFont_->fontColor_ = lerp(fontColor_,Vector4(1.0f,1.0f,1.0f,1.0f),localT,EaseType::EaseInCubic);
+
+		// 座標
+		numFont_->transform_.position.x = lerp(pos_.x, pos_.x - (32.0f * 0.5f), localT, EaseType::EaseInCubic);
 	} else {
 		float localT = (timer_ - 0.5f) / 0.5f;
 
-		// 座標
-		numFont_->transform_.position.x = lerp(pos_.x - (32.0f * 0.5f),pos_.x, localT, EaseType::EaseInCubic);
-
 		// スケール
-		float width = lerp(1.5f, 1.0f, localT, EaseType::EaseInCubic);
-		numFont_->transform_.scale.x = width;
-		numFont_->transform_.scale.y = -width;
+		float width = lerp(0.5f, 0.0f, localT, EaseType::EaseInCubic);
+		numFont_->transform_.scale.x = size_.x + width;
+		numFont_->transform_.scale.y = size_.y - width;
 		// フォントの色
 		numFont_->fontColor_ = lerp(Vector4(1.0f, 1.0f, 1.0f, 1.0f),fontColor_ , localT, EaseType::EaseInCubic);
+
+		// 座標
+		numFont_->transform_.position.x = lerp(pos_.x - (32.0f * 0.5f), pos_.x, localT, EaseType::EaseInCubic);
 	}
 
 	if (timer_ >= 1.0f) {

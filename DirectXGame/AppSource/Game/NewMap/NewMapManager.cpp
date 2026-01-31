@@ -6,6 +6,7 @@ void NewMapManager::Initialize(ModelManager* modelManager) {
 	LoadMapData();
 	LoadModelList();
 	LoadDecoData();
+	LoadStageConfig();
 }
 
 CurrentStageConfig NewMapManager::GetStageMap(int stage, int map) {
@@ -152,7 +153,7 @@ void NewMapManager::LoadStageConfig() {
 	int index = 0;
 
 	while (index < values.size()) {
-		StageData stage = stageData_.emplace_back();
+		StageData& stage = stageData_.emplace_back();
 		int initOre = BinaryManager::Reverse<int>(values[index++].get());
 		int mapSize = BinaryManager::Reverse<int>(values[index++].get());
 		std::vector<MapConfig> configs;

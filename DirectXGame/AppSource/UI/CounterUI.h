@@ -15,6 +15,8 @@ public:
 
 	Vector3 pos_;
 
+	Vector3 size_ = { 1.0f,-1.0f,1.0f };
+
 private:
 
 	std::unique_ptr<FontObject> fontObject_;
@@ -31,6 +33,8 @@ private:
 	float timer_ = 0.0f;
 	float maxTime_ = 0.5f;
 	bool isAnimation_ = false;
+
+	float textSize_ = 64.0f;
 
 private:
 

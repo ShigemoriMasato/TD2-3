@@ -19,6 +19,8 @@ public:
 
 	Vector3 pos_ = {500.0f,128.0f,0.0f};
 
+	Vector3 size_ = { 1.0f,-1.0f,1.0f };
+
 private:
 
 	// フォントロード
@@ -34,6 +36,10 @@ private:
 
 	float timer_ = 0.0f;
 	float maxTime_ = 0.3f;
+
+	float offsetX_ = 0.0f;
+
+	int32_t digits_ = 0;
 
 	bool isAnimation_ = false;
 

@@ -40,6 +40,13 @@ public:
 	/// </summary>
 	void UpdateCharPositions(const std::wstring& text,FontLoader* fontLoader);
 
+	/// <summary>
+	/// 文字とフォントの更新
+	/// </summary>
+	/// <param name="text"></param>
+	/// <param name="fontLoader"></param>
+	void UpdateCharPositionsAndFont(const std::string& fontName,const std::wstring& text, FontLoader* fontLoader);
+
 	// テキストの数
 	int32_t GetTextSize() { return static_cast<int32_t>(charPositions_.size()); }
 

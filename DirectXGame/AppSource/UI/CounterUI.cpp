@@ -20,20 +20,12 @@ void CounterUI::Initialize(const std::string& fontName, int32_t curNum, int32_t 
 	// テキストの初期化
 	maxnumFontObject_ = std::make_unique<FontObject>();
 	maxnumFontObject_->Initialize(fontName, s, drawData, fontLoader);
+	maxnumFontObject_->transform_.scale = { 0.8f,-0.8f,1.0f };
 }
 
 void CounterUI::Update(int32_t curNum, int32_t maxNum) {
-#ifdef USE_IMGUI
 
-	float i = 1.0f;
-	if (currenyNum_ >= 10) {
-		i = 2.0f;
-	}
-
-	// 位置の更新
-	fontObject_->transform_.position = pos_;
-	maxnumFontObject_->transform_.position = pos_ + Vector3(32.0f * i + 14.0f, 0.0f, 0.0f);
-#endif
+	fontObject_->transform_.scale = size_;
 
 	if (curNum != currenyNum_ || maxNum != maxNum_) {
 
@@ -44,12 +36,32 @@ void CounterUI::Update(int32_t curNum, int32_t maxNum) {
 
 		// カウントによりテクスチャを更新
 		fontObject_->UpdateCharPositions(std::to_wstring(curNum), fontLoader_);
+		maxnumFontObject_->UpdateCharPositions(L"/" + std::to_wstring(maxNum), fontLoader_);
 	}
 
 	// アニメーションの更新処理
 	if (isAnimation_) {
 		Animation();
 	}
+
+	// 1つの文字サイズ
+	textSize_ = fontObject_->transform_.scale.x * 64.0f;
+
+	// 位置の更新
+	int digitCount = (currenyNum_ >= 10) ? 2 : 1;
+	float totalWidth = digitCount * textSize_;
+	float totalHeight = textSize_;
+
+	float offsetX = totalWidth * 0.5f;
+	float offsetY = totalHeight * 0.5f;
+
+	fontObject_->transform_.position.x = pos_.x - offsetX;
+	fontObject_->transform_.position.y = pos_.y - offsetY;
+
+	float maxTextSize = (maxnumFontObject_->transform_.scale.x * 64.0f) * 0.5f;
+	maxnumFontObject_->transform_.position = pos_;
+	maxnumFontObject_->transform_.position.x = fontObject_->transform_.position.x + offsetX + textSize_*0.4f;
+	maxnumFontObject_->transform_.position.y = pos_.y - maxTextSize;
 }
 
 void CounterUI::Draw(Window* window, const Matrix4x4& vpMatrix) {
@@ -66,23 +78,18 @@ void CounterUI::Animation() {
 	if (timer_ <= 0.5f) {
 		float localT = timer_ / 0.5f;
 
-		// 座標
-		fontObject_->transform_.position.x = lerp(pos_.x, pos_.x - (32.0f * 0.5f), localT, EaseType::EaseInCubic);
-
 		// スケール
-		float width = lerp(1.0f, 1.5f, localT, EaseType::EaseInCubic);
-		fontObject_->transform_.scale.x = width;
-		fontObject_->transform_.scale.y = -width;
+		float width = lerp(0.0f, 0.2f, localT, EaseType::EaseInCubic);
+		fontObject_->transform_.scale.x = size_.x + width;
+		fontObject_->transform_.scale.y = size_.y - width;
+
 	} else {
 		float localT = (timer_ - 0.5f) / 0.5f;
 
-		// 座標
-		fontObject_->transform_.position.x = lerp(pos_.x - (32.0f * 0.5f), pos_.x, localT, EaseType::EaseInCubic);
-
 		// スケール
-		float width = lerp(1.5f, 1.0f, localT, EaseType::EaseInCubic);
-		fontObject_->transform_.scale.x = width;
-		fontObject_->transform_.scale.y = -width;
+		float width = lerp(0.2f, 0.0f, localT, EaseType::EaseInCubic);
+		fontObject_->transform_.scale.x = size_.x + width;
+		fontObject_->transform_.scale.y = size_.y - width;
 	}
 
 	if (timer_ >= 1.0f) {

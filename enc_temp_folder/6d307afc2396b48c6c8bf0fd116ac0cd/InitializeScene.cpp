@@ -39,10 +39,13 @@ void InitializeScene::Initialize() {
 	commonData_->nextMapIndex = 1;
 }
 
-std::unique_ptr<IScene> InitializeScene::Update(){
-
-	//return std::make_unique<ModelEditScene>();
+std::unique_ptr<IScene> InitializeScene::Update() {
+	return std::make_unique<ModelEditScene>();
+<<<<<<< HEAD
+	//return std::make_unique<GameScene>();
+=======
 	return std::make_unique<GameScene>();
+>>>>>>> cbf7fa3842ad51b4ed1a18908125c3536afb03e7
 }
 
 void InitializeScene::Draw() {
@@ -110,7 +113,7 @@ void InitializeScene::EngineSetup() {
 	//FPS
 	auto fps = engine_->GetFPSObserver();
 	fps->SetIsFix(true);
-	fps->SetTargetFPS(30.0);
+	fps->SetTargetFPS(60.0);
 }
 
 void InitializeScene::SetupKeyManager() {

@@ -16,6 +16,7 @@
 #include "UI/OreUnitHPUI.h"
 #include "Unit/UnitEffectManager.h"
 #include "Item/HomeManager.h"
+#include "UI/StartCountUI.h"
 
 #include <Game/MiniMap/MiniMap.h>
 #include <ModelEditScene/Render/MapRender.h>
@@ -116,6 +117,10 @@ private:
 
 	// 時間を測る
 	std::unique_ptr<TimeTracker> timeTracker_;
+	bool isTimerSet_ = false;
+
+	// カウントUI
+	std::unique_ptr<StartCountUI> startCountUI_;
 
 	//================================================
 	// ゲームオーバーシーン
