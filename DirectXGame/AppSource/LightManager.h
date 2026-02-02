@@ -40,7 +40,7 @@ public:
 		auto values = binaryManager_.Read("LightConfig");
 		dirLights_.clear();
 		int index = 0;
-		while(index < values.size()) {
+		while (index < values.size()) {
 			DirectionalLight dirLight;
 			dirLight.color = binaryManager_.Reverse<Vector4>(values[index++].get());
 			dirLight.direction = binaryManager_.Reverse<Vector3>(values[index++].get());
@@ -72,7 +72,8 @@ public:
 	//PointLightの位置更新。最後推奨
 	void Update() {
 		for (size_t i = 0; i < pointLights_.size(); ++i) {
-			pointLights_[i].position = *pointPositions_[i];
+			if (pointLightActive_[i])
+				pointLights_[i].position = *pointPositions_[i];
 		}
 	}
 
@@ -93,7 +94,7 @@ public:
 			if (ImGui::Button(std::to_string(i).c_str())) {
 				editingDirLightIndex_ = i;
 			}
-			if(i % 3 != 2) {
+			if (i % 3 != 2) {
 				ImGui::SameLine();
 			}
 		}

@@ -38,12 +38,12 @@ void InitializeScene::Initialize() {
 	// テクスチャを全てロード
 	textureManager_->LoadAllTextures();
 
-	commonData_->nextStageIndex = 0;
+	commonData_->nextStageIndex = 1;
 	commonData_->nextMapIndex = 0;
 
 	LightManager::GetInstance()->Load();
   
-  // ランダム生成器を初期化
+	  // ランダム生成器を初期化
 	RandomGenerator::Initialize();
 }
 
