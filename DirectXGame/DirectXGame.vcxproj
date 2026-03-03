@@ -263,6 +263,8 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts/FilterAdjust.ps1"</
     <ClCompile Include="AppSource\ModelEditScene\Editor\Stage\StageEditor.cpp" />
     <ClCompile Include="AppSource\OreAddScene\OreAddScene.cpp" />
     <ClCompile Include="AppSource\UI\Number.cpp" />
+    <ClInclude Include="AppSource\GameCamera\DebugMousePos.h" />
+    <ClInclude Include="AppSource\GameCamera\SelectCamera.h" />
     <ClInclude Include="AppSource\Item\Effect\DirtMoveParticle.h" />
     <ClInclude Include="AppSource\Item\Effect\OreBreakParticle.h" />
     <ClInclude Include="AppSource\UI\Effect\ConfettiEffectUI.h" />
