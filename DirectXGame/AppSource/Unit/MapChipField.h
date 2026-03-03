@@ -134,6 +134,8 @@ public: // 探索アルゴリズム
 	/// <returns></returns>
 	std::vector<Vector3> CalculatePath(const Vector3& start, const Vector3& end);
 
+	std::vector<Vector3> GradeCalculatePath(const Vector3& start, const Vector3& end);
+
 	// 経路探索用
 	struct Node {
 		int x, z; // インデックス

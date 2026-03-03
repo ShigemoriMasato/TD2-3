@@ -280,6 +280,16 @@ std::unique_ptr<IScene> SelectScene::Update() {
 	input_->Update();
 	commonData_->keyManager->Update();
 
+	// マウスのスクリーン座標を取得する
+	POINT cursorPos;
+	Vector2 screenMousePos = {};
+	if (GetCursorPos(&cursorPos)) {
+		// スクリーン座標をクライアント座標に変換
+		ScreenToClient(gameWindow_->GetWindow()->GetHwnd(), &cursorPos);
+		// カーソル位置をワールド座標に変換
+		screenMousePos = { static_cast<float>(cursorPos.x), static_cast<float>(cursorPos.y) };
+	}
+
 	debugCamera_->Update();
 	camera_ = *static_cast<Camera*>(debugCamera_.get());
 

@@ -61,17 +61,18 @@ void PlayerUnit::Update() {
 	if (isAutoMove_) {
 
 		if (path_.empty()) {
-			Vector3 toTarget = targetPos_ - object_->transform_.position;
-			toTarget.y = 0.0f;
-			// XZ平面での距離を計算
-			float distance = std::sqrt(toTarget.x * toTarget.x + toTarget.z * toTarget.z);
-
-			object_->transform_.position += (toTarget / distance) * speed_ * FpsCount::deltaTime;
-
-			// 自動移動状態を解除する
-			if (distance < 0.1f) {
-				isAutoMove_ = false;
-			}
+			isAutoMove_ = false;
+			//Vector3 toTarget = targetPos_ - object_->transform_.position;
+			//toTarget.y = 0.0f;
+			//// XZ平面での距離を計算
+			//float distance = std::sqrt(toTarget.x * toTarget.x + toTarget.z * toTarget.z);
+			//
+			//object_->transform_.position += (toTarget / distance) * speed_ * FpsCount::deltaTime;
+			//
+			//// 自動移動状態を解除する
+			//if (distance < 0.1f) {
+			//	isAutoMove_ = false;
+			//}
 		} else {
 			// 自動移動
 			AutoMove();
@@ -79,6 +80,11 @@ void PlayerUnit::Update() {
 
 		// 自動回転
 		AutoRotate();
+
+		// アニメーション
+		if (!isAnimation_) {
+			isAnimation_ = true;
+		}
 	} else {
 
 		// 入力処理
@@ -375,10 +381,9 @@ void PlayerUnit::AutoMove() {
 
 void PlayerUnit::AutoRotate() {
 	// 回転処理
+	if (path_.empty()) { return; }
 	Vector3 nextTarget = {};
-	if (!path_.empty()) {
-		nextTarget = path_.front();
-	}
+	nextTarget = path_.front();
 	Vector3 toTarget = nextTarget - object_->transform_.position;
 	toTarget.y = 0.0f;
 	toTarget.Normalize();
@@ -386,17 +391,7 @@ void PlayerUnit::AutoRotate() {
 	// 現在の進行方向ベクトルを保持
 	dir_ = toTarget;
 
-	Vector3 targetRot = { 0, 0, 0 };
-	// Y軸回転を取得
-	targetRot.y = atan2f(toTarget.x, toTarget.z);
-	Vector3 currentRot = object_->transform_.rotate;
-
-	// 最短距離の角度を取得
-	float diffY = GetShortAngleY(targetRot.y - currentRot.y);
-
-	// 回転
-	currentRot.y += diffY * rotateSpeed_ * FpsCount::deltaTime;
-	object_->transform_.rotate = currentRot;
+	Rotate();
 }
 
 void PlayerUnit::CalculatePath(const Vector3& goal) {
@@ -406,7 +401,7 @@ void PlayerUnit::CalculatePath(const Vector3& goal) {
 	if (mapChipField_) {
 		// マップクラスに経路計算を依頼
 		// startPos は現在の自分の位置
-		std::vector<Vector3> calculatedPath = mapChipField_->CalculatePath(object_->transform_.position, goal);
+		std::vector<Vector3> calculatedPath = mapChipField_->GradeCalculatePath(object_->transform_.position, goal);
 		path_ = calculatedPath;
 
 		if (!path_.empty()) {

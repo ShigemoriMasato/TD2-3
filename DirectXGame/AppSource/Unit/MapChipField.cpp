@@ -312,6 +312,129 @@ std::vector<Vector3> MapChipField::CalculatePath(const Vector3& start, const Vec
 	return path;
 }
 
+std::vector<Vector3> MapChipField::GradeCalculatePath(const Vector3& start, const Vector3& end) {
+	std::vector<Vector3> path;
+
+	IndexSet startIndex = GetMapChipIndexSetByPosition(start);
+	IndexSet endIndex = GetMapChipIndexSetByPosition(end);
+
+	// 範囲外チェック
+	if (startIndex.xIndex < 0 || startIndex.xIndex >= kNumBlockHorizontal ||
+		startIndex.zIndex < 0 || startIndex.zIndex >= kNumBlockVirtical ||
+		endIndex.xIndex < 0 || endIndex.xIndex >= kNumBlockHorizontal ||
+		endIndex.zIndex < 0 || endIndex.zIndex >= kNumBlockVirtical) {
+		return path; // 空のパスを返す
+	}
+
+	// ゴールが壁なら、近くの空いている場所を探すか、計算を諦める
+	// ここでは単純にゴールが壁なら空のパスを返すことにします
+	if (GetBlockTypeByIndex(endIndex.xIndex, endIndex.zIndex) == TileType::Wall) {
+		return path;
+	}
+
+	// 探索用データの準備
+	// 各マスのノード情報を管理する2次元配列 (探索済みかどうかやコストを保持)
+	std::vector<std::vector<Node>> nodes(kNumBlockVirtical, std::vector<Node>(kNumBlockHorizontal));
+
+	// 初期化
+	for (int z = 0; z < kNumBlockVirtical; ++z) {
+		for (int x = 0; x < kNumBlockHorizontal; ++x) {
+			nodes[z][x] = { x, z, FLT_MAX, 0.0f, nullptr };
+		}
+	}
+
+	// スタート地点の設定
+	Node* startNode = &nodes[startIndex.zIndex][startIndex.xIndex];
+	startNode->gCost = 0.0f;
+	startNode->hCost = static_cast<float>(std::abs(endIndex.xIndex - startIndex.xIndex) + std::abs(endIndex.zIndex - startIndex.zIndex)); // マンハッタン距離
+
+	// オープンリスト
+	// ポインタを格納し、比較関数を定義
+	auto comp = [](Node* a, Node* b) { return a->fCost() > b->fCost(); };
+	std::priority_queue<Node*, std::vector<Node*>, decltype(comp)> openList(comp);
+
+	openList.push(startNode);
+
+	// 探索ループ
+	// 上下左右の移動方向
+	const int dx[] = { 0, 0, -1, 1, -1, 1, -1, 1 };
+	const int dz[] = { -1, 1, 0, 0, -1, -1, 1, 1 };
+
+	Node* currentNode = nullptr;
+
+	while (!openList.empty()) {
+		// 最もコストが低いノードを取り出す
+		currentNode = openList.top();
+		openList.pop();
+
+		// ゴールに到達したらループ終了
+		if (currentNode->x == endIndex.xIndex && currentNode->z == endIndex.zIndex) {
+			break;
+		}
+
+		// 周囲8方向をチェック
+		for (int i = 0; i < 8; ++i) {
+			int nx = currentNode->x + dx[i];
+			int nz = currentNode->z + dz[i];
+
+			// マップ範囲外チェック
+			if (nx < 0 || nx >= kNumBlockHorizontal || nz < 0 || nz >= kNumBlockVirtical) {
+				continue;
+			}
+
+			// タイルの種類を取得
+			TileType nextTileType = GetBlockTypeByIndex(nx, nz);
+
+			// 壁チェック (Wallなら絶対に通れない)
+			if (nextTileType == TileType::Wall) {
+				continue;
+			}
+
+			if (i >= 4) {
+				// 斜め移動の場合、縦・横の隣接マスが壁なら斜め移動を許可しない
+				TileType tileX = GetBlockTypeByIndex(nx, currentNode->z);
+				TileType tileZ = GetBlockTypeByIndex(currentNode->x, nz);
+
+				if (tileX == TileType::Wall || tileZ == TileType::Wall) {
+					continue;
+				}
+			}
+
+			float moveCost = 5.0f;
+			if (i >= 4) {
+				moveCost *= 1.414f;
+			}
+
+			// 新しいGコスト（今のコスト + 計算した移動コスト）
+			float newGCost = currentNode->gCost + moveCost;
+
+			// 既により良い経路が見つかっている場合はスキップ
+			if (newGCost < nodes[nz][nx].gCost) {
+				Node* neighbor = &nodes[nz][nx];
+				neighbor->gCost = newGCost;
+				neighbor->hCost = static_cast<float>(std::abs(endIndex.xIndex - nx) + std::abs(endIndex.zIndex - nz));
+				neighbor->parent = currentNode;
+
+				openList.push(neighbor);
+			}
+		}
+	}
+
+	// 経路が見つかった場合、ゴールから親を辿ってリストを作成
+	if (currentNode && currentNode->x == endIndex.xIndex && currentNode->z == endIndex.zIndex) {
+		Node* node = currentNode;
+		while (node != nullptr) {
+			// インデックスをワールド座標に変換して追加
+			path.push_back(GetMapChipPositionByIndex(node->x, node->z));
+			node = node->parent;
+		}
+		// ゴール -> スタートの順になっているので反転させる
+		std::reverse(path.begin(), path.end());
+	}
+
+	return path;
+}
+
 Vector3 MapChipField::CornerPosition(const Vector3& center, Corner corner, const CollisionMapInfo& info) {
 
 	// 各角の座標
