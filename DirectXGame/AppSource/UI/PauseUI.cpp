@@ -2,6 +2,7 @@
 #include"Utility/Easing.h"
 #include"FpsCount.h"
 #include"Assets/Audio/AudioManager.h"
+#include"GameCamera/DebugMousePos.h"
 
 void PauseUI::Initialize(DrawData drawData, uint32_t texture, KeyManager* keyManager,
 	const std::string& fontName, DrawData fontDrawData, FontLoader* fontLoader,
@@ -165,9 +166,27 @@ void PauseUI::InUpdate() {
 		}
 	}
 
+	Vector2 screenPos = {};
+#ifdef USE_IMGUI
+	screenPos = DebugMousePos::gameMousePos;
+#else
+	screenPos = DebugMousePos::screenMousePos;
+#endif
+
+	// マウス位置に夜選択
+	for (size_t i = 0; i < selectSpriteObject_.size(); ++i) {
+		if (selectSpriteObject_[i]->transform_.position.x - 128.0f <= screenPos.x &&
+			selectSpriteObject_[i]->transform_.position.x + 128.0f >= screenPos.x) {
+			if (selectSpriteObject_[i]->transform_.position.y - 32.0f <= screenPos.y &&
+				selectSpriteObject_[i]->transform_.position.y + 32.0f >= screenPos.y) {
+				selectNum_ = static_cast<int>(i);
+			}
+		}
+	}
+
 	if (isOpenPause_) {
 
-		if (key[Key::Decision]) {
+		if (key[Key::Decision] || ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80))) {
 
 			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
 				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
@@ -189,7 +208,7 @@ void PauseUI::InUpdate() {
 				onSelectClicked_();
 			}
 
-		}else if (key[Key::DecisionPause]) {
+		}else if (key[Key::DecisionPause] || ((Input::GetMouseButtonState()[1] & 0x80) && !(Input::GetPreMouseButtonState()[1] & 0x80))) {
 			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
 				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
 			}
@@ -205,7 +224,7 @@ void PauseUI::InUpdate() {
 		}
 	} else {
 		// 決定
-		if (key[Key::DecisionPause]) {
+		 if (key[Key::DecisionPause] || ((Input::GetMouseButtonState()[1] & 0x80) && !(Input::GetPreMouseButtonState()[1] & 0x80))) {
 			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
 				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
 			}
