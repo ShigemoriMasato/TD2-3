@@ -52,6 +52,12 @@ public:
 	void DrawIcon(Window* window, const Matrix4x4& vpMatrix);
 
 	/// <summary>
+	/// プレイヤーを移動させる
+	/// </summary>
+	/// <param name="pos"></param>
+	void MovePlayer(const Vector3& pos);
+
+	/// <summary>
 	/// ユニットを出動させる
 	/// </summary>
 	/// <param name="targetPos">移動する目標位置</param>

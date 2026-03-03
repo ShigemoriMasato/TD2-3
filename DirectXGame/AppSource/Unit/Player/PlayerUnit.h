@@ -20,6 +20,9 @@ public:
 	// 当たり判定
 	void OnCollision(Collider* other) override;
 
+	// 移動する位置を設定する
+	void SetMovePos(const Vector3& targetPos);
+
 public:
 
 	Vector3* GetPos() { return &object_->transform_.position; }
@@ -61,6 +64,13 @@ private:
 	bool isMove_ = false;
 
 	Vector2 mapMapSize_;
+
+	// 移動ルート
+	std::vector<Vector3> path_;
+
+	bool isAutoMove_ = false;
+
+	Vector3 targetPos_ = {};
 	
 private: // 調整項目
 
@@ -117,6 +127,15 @@ private:
 
 	// アニメーション
 	void AnimationUpdate();
+
+	// 自動移動
+	void AutoMove();
+
+	// 自動回転
+	void AutoRotate();
+
+	// 移動経路を求める
+	void CalculatePath(const Vector3& goal);
 
 private:
 

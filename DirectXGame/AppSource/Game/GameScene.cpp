@@ -805,6 +805,10 @@ void GameScene::InGameScene() {
 	} else {
 		// 左クリックを取得
 		if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
+
+			// プレイヤーの移動位置を設定
+			unitManager_->MovePlayer(cameraController_->GetWorldPos());
+
 			// クリックアニメーションを開始
 			cameraController_->StartAnimation();
 		}

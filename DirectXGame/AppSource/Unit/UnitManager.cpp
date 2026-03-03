@@ -221,6 +221,21 @@ void UnitManager::DrawIcon(Window* window, const Matrix4x4& vpMatrix) {
 	}
 }
 
+void UnitManager::MovePlayer(const Vector3& pos) {
+
+	// 指定した位置のブロックの種類を取得する
+	MapChipField::IndexSet index =  mapChipField_->GetMapChipIndexSetByPosition(pos);
+	TileType type = mapChipField_->GetBlockTypeByIndex(index.xIndex,index.zIndex);
+
+	// 移動可能な場合
+	if (type != TileType::Wall && type != TileType::Home &&
+		type != TileType::Gold && type != TileType::MediumGold && type != TileType::LargeGold) {
+
+		// プレイヤーの自動移動を設定
+		playerUnit_->SetMovePos(pos);
+	}
+}
+
 void UnitManager::RegisterUnit(const Vector3& targetPos, const int32_t& spawnNum, const int32_t& excessNum, OreItem* oreItem) {
 
 	// 生成出来る最大の数を超えていれば、早期リターン

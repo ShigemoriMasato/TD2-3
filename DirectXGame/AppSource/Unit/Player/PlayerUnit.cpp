@@ -58,24 +58,48 @@ void PlayerUnit::Update() {
 	ApplyDebugParam();
 #endif
 
-	// 入力処理
-	ProcessMoveInput();
+	if (isAutoMove_) {
 
-	// 衝突判定情報を初期化
-	MapChipField::CollisionMapInfo collisionMapInfo;
-	// 移動量に速度の値をコピー
-	collisionMapInfo.move = velocity_;
-	collisionMapInfo.pos = object_->transform_.position;
-	collisionMapInfo.size = size_;
+		if (path_.empty()) {
+			Vector3 toTarget = targetPos_ - object_->transform_.position;
+			toTarget.y = 0.0f;
+			// XZ平面での距離を計算
+			float distance = std::sqrt(toTarget.x * toTarget.x + toTarget.z * toTarget.z);
 
-	// マップ衝突判定
-	CheckMapCollision(collisionMapInfo);
+			object_->transform_.position += (toTarget / distance) * speed_ * FpsCount::deltaTime;
 
-	// 移動
-	object_->transform_.position += collisionMapInfo.move;
+			// 自動移動状態を解除する
+			if (distance < 0.1f) {
+				isAutoMove_ = false;
+			}
+		} else {
+			// 自動移動
+			AutoMove();
+		}
 
-	// 回転処理
-	Rotate();
+		// 自動回転
+		AutoRotate();
+	} else {
+
+		// 入力処理
+		ProcessMoveInput();
+
+		// 衝突判定情報を初期化
+		MapChipField::CollisionMapInfo collisionMapInfo;
+		// 移動量に速度の値をコピー
+		collisionMapInfo.move = velocity_;
+		collisionMapInfo.pos = object_->transform_.position;
+		collisionMapInfo.size = size_;
+
+		// マップ衝突判定
+		CheckMapCollision(collisionMapInfo);
+
+		// 移動
+		object_->transform_.position += collisionMapInfo.move;
+
+		// 回転処理
+		Rotate();
+	}
 
 	// アニメーション処理
 	AnimationUpdate();
@@ -311,6 +335,96 @@ void PlayerUnit::AnimationUpdate() {
 				isAnimation_ = false;
 			}
 		}
+	}
+}
+
+void PlayerUnit::SetMovePos(const Vector3& targetPos) {
+	isAutoMove_ = true;
+	targetPos_ = targetPos;
+	// 経路を設定
+	CalculatePath(targetPos);
+}
+
+void PlayerUnit::AutoMove() {
+
+	// パスに何も存在しなければ早期リターン
+	if (path_.empty()) { return; }
+
+	// 次に進むべき座標を取得
+	Vector3 nextTarget = path_.front();
+	Vector3 currentPos = object_->transform_.position;
+
+	// 次の地点へのベクトルを計算
+	Vector3 toTarget = nextTarget - currentPos;
+	toTarget.y = 0.0f;
+
+	// XZ平面での距離を計算
+	float distance = std::sqrt(toTarget.x * toTarget.x + toTarget.z * toTarget.z);
+
+	// 移動処理
+	if (distance < 0.1f) {
+		// 十分近づいたら座標を確定させて、リストから削除（次の地点へ）
+		object_->transform_.position = nextTarget;
+		path_.erase(path_.begin());
+	} else {
+		// 目的地に向かって移動
+		Vector3 velocity = (toTarget / distance) * speed_;
+		object_->transform_.position += velocity * FpsCount::deltaTime;
+	}
+}
+
+void PlayerUnit::AutoRotate() {
+	// 回転処理
+	Vector3 nextTarget = {};
+	if (!path_.empty()) {
+		nextTarget = path_.front();
+	}
+	Vector3 toTarget = nextTarget - object_->transform_.position;
+	toTarget.y = 0.0f;
+	toTarget.Normalize();
+
+	// 現在の進行方向ベクトルを保持
+	dir_ = toTarget;
+
+	Vector3 targetRot = { 0, 0, 0 };
+	// Y軸回転を取得
+	targetRot.y = atan2f(toTarget.x, toTarget.z);
+	Vector3 currentRot = object_->transform_.rotate;
+
+	// 最短距離の角度を取得
+	float diffY = GetShortAngleY(targetRot.y - currentRot.y);
+
+	// 回転
+	currentRot.y += diffY * rotateSpeed_ * FpsCount::deltaTime;
+	object_->transform_.rotate = currentRot;
+}
+
+void PlayerUnit::CalculatePath(const Vector3& goal) {
+	// メンバ変数のパスをクリア
+	path_.clear();
+
+	if (mapChipField_) {
+		// マップクラスに経路計算を依頼
+		// startPos は現在の自分の位置
+		std::vector<Vector3> calculatedPath = mapChipField_->CalculatePath(object_->transform_.position, goal);
+		path_ = calculatedPath;
+
+		if (!path_.empty()) {
+			Vector3 toFirst = path_.front() - object_->transform_.position;
+			toFirst.y = 0.0f;
+
+			// Move()で使用している判定距離(0.1f)よりも少し広めに判定をとる（例: 0.5f）
+			// これにより「今のマスの中心に戻る」という挙動を防ぐ
+			if (toFirst.Length() < 0.5f) {
+				path_.erase(path_.begin());
+			}
+		}
+	}
+
+	// もし経路が見つからなかった場合
+	if (path_.empty()) {
+		// とりあえずゴール地点だけ入れておく
+		path_.push_back(goal);
 	}
 }
 
