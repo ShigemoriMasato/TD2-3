@@ -208,7 +208,7 @@ void PauseUI::InUpdate() {
 				onSelectClicked_();
 			}
 
-		}else if (key[Key::DecisionPause] || ((Input::GetMouseButtonState()[1] & 0x80) && !(Input::GetPreMouseButtonState()[1] & 0x80))) {
+		}else if (key[Key::DecisionPause]) {
 			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
 				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
 			}
@@ -224,7 +224,7 @@ void PauseUI::InUpdate() {
 		}
 	} else {
 		// 決定
-		 if (key[Key::DecisionPause] || ((Input::GetMouseButtonState()[1] & 0x80) && !(Input::GetPreMouseButtonState()[1] & 0x80))) {
+		 if (key[Key::DecisionPause]) {
 			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
 				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
 			}
