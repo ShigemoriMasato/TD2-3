@@ -85,6 +85,15 @@ void PlayerUnit::Update() {
 		if (!isAnimation_) {
 			isAnimation_ = true;
 		}
+
+		// 操作
+		auto key = keyManager_->GetKeyStates();
+
+		// 操作があれば自動移動を削除
+		if (key[Key::Up] || key[Key::Down] || key[Key::Left] || key[Key::Right]) {
+			isAutoMove_ = false;
+		}
+
 	} else {
 
 		// 入力処理

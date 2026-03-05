@@ -95,6 +95,18 @@ TileType MapChipField::GetBlockTypeByIndex(int32_t xIndex, int32_t zIndex) const
 	return data_[zIndex][xIndex];
 }
 
+bool MapChipField::CheckPosInMap(int32_t xIndex, int32_t zIndex) const {
+	// 範囲外を指定されたら空白を返す
+	if (xIndex < 0 || kNumBlockHorizontal - 1 < xIndex) {
+		return false;
+	}
+	if (zIndex < 0 || kNumBlockVirtical - 1 < zIndex) {
+		return false;
+	}
+
+	return true;
+}
+
 Vector3 MapChipField::GetMapChipPositionByIndex(int32_t xIndex, int32_t zIndex) const {
 	return Vector3(kBlockWidth * static_cast<float>(xIndex), 0, static_cast<float>(kBlockHeight * zIndex));
 }

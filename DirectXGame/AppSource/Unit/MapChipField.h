@@ -76,6 +76,9 @@ public: // マップの情報
 	/// <returns></returns>
 	TileType GetBlockTypeByIndex(int32_t xIndex, int32_t zIndex) const;
 
+	// マップの中にいるか確認する
+	bool CheckPosInMap(int32_t xIndex, int32_t zIndex) const;
+
 	/// <summary>
 	/// 指定されたマップチップデータの座標を返す
 	/// </summary>

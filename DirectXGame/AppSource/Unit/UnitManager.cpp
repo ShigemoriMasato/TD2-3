@@ -225,6 +225,7 @@ void UnitManager::MovePlayer(const Vector3& pos) {
 
 	// 指定した位置のブロックの種類を取得する
 	MapChipField::IndexSet index =  mapChipField_->GetMapChipIndexSetByPosition(pos);
+	if (!mapChipField_->CheckPosInMap(index.xIndex, index.zIndex)) { return; }
 	TileType type = mapChipField_->GetBlockTypeByIndex(index.xIndex,index.zIndex);
 
 	// 移動可能な場合
