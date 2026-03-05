@@ -384,64 +384,74 @@ void SelectScene::InGameScene() {
 		}
 
 		// マウス位置で選択
-		if (leSprite_->transform_.position.x - 80.0f <= mousePos_.x &&
-			leSprite_->transform_.position.x + 80.0f >= mousePos_.x) {
-			if (leSprite_->transform_.position.y - 80.0f <= mousePos_.y &&
-				leSprite_->transform_.position.y + 80.0f >= mousePos_.y) {
+		if ((leSprite_->transform_.position.x - 80.0f <= mousePos_.x &&
+			leSprite_->transform_.position.x + 80.0f >= mousePos_.x) &&
+			(leSprite_->transform_.position.y - 80.0f <= mousePos_.y &&
+				leSprite_->transform_.position.y + 80.0f >= mousePos_.y)) {
 
-				// 左に移動
-				if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
-					if (!selectStageUI_->IsAnimation() && !isPlayerAnimation_) {
-						if (selectStageNum_ > 1) {
-							selectStageNum_ -= 1;
-							selectStageUI_->SetAnimation();
-							// プレイヤー関係
-							isPlayerAnimation_ = true;
-							startPos_ = playerObject_->transform_.position;
-							endPos_ = stagePointObjects_[selectStageNum_ - 1]->transform_.position;
-							endPos_.y = -1.4f;
-							selectDir_ = -1.0f;
-							startRotY_ = playerObject_->transform_.rotate.y;
-							endRotY_ = -std::numbers::pi_v<float> / 2;
-							isLeftAnimation_ = true;
+			leSprite_->transform_.scale.x = 160.0f;
+			leSprite_->transform_.scale.y = 160.0f;
 
-							if (!AudioManager::GetInstance().IsPlay(playerMove_)) {
-								AudioManager::GetInstance().Play(playerMove_, 0.5f, false);
-							}
+			// 左に移動
+			if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
+				if (!selectStageUI_->IsAnimation() && !isPlayerAnimation_) {
+					if (selectStageNum_ > 1) {
+						selectStageNum_ -= 1;
+						selectStageUI_->SetAnimation();
+						// プレイヤー関係
+						isPlayerAnimation_ = true;
+						startPos_ = playerObject_->transform_.position;
+						endPos_ = stagePointObjects_[selectStageNum_ - 1]->transform_.position;
+						endPos_.y = -1.4f;
+						selectDir_ = -1.0f;
+						startRotY_ = playerObject_->transform_.rotate.y;
+						endRotY_ = -std::numbers::pi_v<float> / 2;
+						isLeftAnimation_ = true;
+
+						if (!AudioManager::GetInstance().IsPlay(playerMove_)) {
+							AudioManager::GetInstance().Play(playerMove_, 0.5f, false);
 						}
 					}
 				}
 			}
+		} else {
+			leSprite_->transform_.scale.x = 128.0f;
+			leSprite_->transform_.scale.y = 128.0f;
 		}
 
-		if (riSprite_->transform_.position.x - 80.0f <= mousePos_.x &&
-			riSprite_->transform_.position.x + 80.0f >= mousePos_.x) {
-			if (riSprite_->transform_.position.y - 80.0f <= mousePos_.y &&
-				riSprite_->transform_.position.y + 80.0f >= mousePos_.y) {
+		if ((riSprite_->transform_.position.x - 80.0f <= mousePos_.x &&
+			riSprite_->transform_.position.x + 80.0f >= mousePos_.x) && 
+			(riSprite_->transform_.position.y - 80.0f <= mousePos_.y &&
+				riSprite_->transform_.position.y + 80.0f >= mousePos_.y)) {
 
-				// 右に移動
-				if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
-					if (!selectStageUI_->IsAnimation() && !isPlayerAnimation_) {
-						if (selectStageNum_ < maxStageNum_) {
-							selectStageNum_ += 1;
-							selectStageUI_->SetAnimation();
-							// プレイヤー関係
-							isPlayerAnimation_ = true;
-							startPos_ = playerObject_->transform_.position;
-							endPos_ = stagePointObjects_[selectStageNum_ - 1]->transform_.position;
-							endPos_.y = -1.4f;
-							selectDir_ = 1.0f;
-							startRotY_ = playerObject_->transform_.rotate.y;
-							endRotY_ = std::numbers::pi_v<float> / 2;
-							isRightAnimation_ = true;
+			riSprite_->transform_.scale.x = 160.0f;
+			riSprite_->transform_.scale.y = 160.0f;
 
-							if (!AudioManager::GetInstance().IsPlay(playerMove_)) {
-								AudioManager::GetInstance().Play(playerMove_, 0.5f, false);
-							}
+			// 右に移動
+			if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
+				if (!selectStageUI_->IsAnimation() && !isPlayerAnimation_) {
+					if (selectStageNum_ < maxStageNum_) {
+						selectStageNum_ += 1;
+						selectStageUI_->SetAnimation();
+						// プレイヤー関係
+						isPlayerAnimation_ = true;
+						startPos_ = playerObject_->transform_.position;
+						endPos_ = stagePointObjects_[selectStageNum_ - 1]->transform_.position;
+						endPos_.y = -1.4f;
+						selectDir_ = 1.0f;
+						startRotY_ = playerObject_->transform_.rotate.y;
+						endRotY_ = std::numbers::pi_v<float> / 2;
+						isRightAnimation_ = true;
+
+						if (!AudioManager::GetInstance().IsPlay(playerMove_)) {
+							AudioManager::GetInstance().Play(playerMove_, 0.5f, false);
 						}
 					}
 				}
 			}
+		} else {
+			riSprite_->transform_.scale.x = 128.0f;
+			riSprite_->transform_.scale.y = 128.0f;
 		}
 
 		SelectStageNum::num_ = selectStageNum_;
@@ -480,47 +490,51 @@ void SelectScene::InGameScene() {
 			}
 		}
 
-		if (decisSprite_->transform_.position.x - 140.0f <= mousePos_.x &&
-			decisSprite_->transform_.position.x + 140.0f >= mousePos_.x) {
-			if (decisSprite_->transform_.position.y - 50.0f <= mousePos_.y &&
-				decisSprite_->transform_.position.y + 50.0f >= mousePos_.y) {
+		if ((decisSprite_->transform_.position.x - 140.0f <= mousePos_.x &&
+			decisSprite_->transform_.position.x + 140.0f >= mousePos_.x) && 
+			(decisSprite_->transform_.position.y - 50.0f <= mousePos_.y &&
+				decisSprite_->transform_.position.y + 50.0f >= mousePos_.y)) {
 
-				// 決定
-				if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
-					if (!selectStageUI_->IsAnimation() && !isPlayerAnimation_) {
-						// 決定音を鳴らす
-						if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
-							AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
-						}
+			decisSprite_->transform_.scale.x = 280.0f;
+			decisSprite_->transform_.scale.y = 120.0f;
 
-						if (!AudioManager::GetInstance().IsPlay(playerDesicion_)) {
-							AudioManager::GetInstance().Play(playerDesicion_, 0.5f, false);
-						}
+			// 決定
+			if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
+				if (!selectStageUI_->IsAnimation() && !isPlayerAnimation_) {
+					// 決定音を鳴らす
+					if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
+						AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
+					}
 
-						commonData_->nextStageIndex = selectStageNum_ - 1;
-						commonData_->nextMapIndex = 0;
-						commonData_->stageCount = 0;
-						commonData_->normaAndScore_.clear();
+					if (!AudioManager::GetInstance().IsPlay(playerDesicion_)) {
+						AudioManager::GetInstance().Play(playerDesicion_, 0.5f, false);
+					}
+
+					commonData_->nextStageIndex = selectStageNum_ - 1;
+					commonData_->nextMapIndex = 0;
+					commonData_->stageCount = 0;
+					commonData_->normaAndScore_.clear();
+					commonData_->goldNum = 0;
+					commonData_->sumGoldNum_ = 0;
+					commonData_->maxGoldNum = 0;
+					commonData_->maxOreNum = 0;
+					commonData_->killOreNum = 0;
+					commonData_->getOreNum = 0;
+
+					isInPlayerAnimation_ = true;
+					inPlayerStartRotY_ = playerObject_->transform_.rotate.y;
+
+					//EndlessModeのセット
+					if (selectStageNum_ == 3) {
+						commonData_->isEndlessMode = true;
 						commonData_->goldNum = 0;
-						commonData_->sumGoldNum_ = 0;
-						commonData_->maxGoldNum = 0;
-						commonData_->maxOreNum = 0;
-						commonData_->killOreNum = 0;
-						commonData_->getOreNum = 0;
-
-						isInPlayerAnimation_ = true;
-						inPlayerStartRotY_ = playerObject_->transform_.rotate.y;
-
-						//EndlessModeのセット
-						if (selectStageNum_ == 3) {
-							commonData_->isEndlessMode = true;
-							commonData_->goldNum = 0;
-						}
 					}
 				}
 			}
+		} else {
+			decisSprite_->transform_.scale.x = 230.0f;
+			decisSprite_->transform_.scale.y = 83.0f;
 		}
-
 	}
 
 	//==============================================
@@ -557,7 +571,6 @@ void SelectScene::InGameScene() {
 			fadeTransition_->SetFade(FadeTransition::Phase::Out);
 		}
 
-		decisSprite_->Update();
 	} else {
 		if (isPlayerAnimation_) {
 			timer_ += FpsCount::deltaTime / moveTime_;
@@ -630,6 +643,7 @@ void SelectScene::InGameScene() {
 
 	leSprite_->Update();
 	riSprite_->Update();
+	decisSprite_->Update();
 	floorObject_->Update();
 
 	//=====================================================
