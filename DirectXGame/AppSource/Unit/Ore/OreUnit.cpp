@@ -54,7 +54,7 @@ OreUnit::OreUnit(MapChipField* mapChipField, DrawData drawData, int texture, Vec
 			Vector3 pos = homePos_ - object_->transform_.position;
 			pos.y = 0.0f;
 			float dis = pos.Length();
-			moveTime_ = dis * 0.2f;
+			moveTime_ = dis * 0.20f;
 		}
 	};
 
