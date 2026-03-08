@@ -12,6 +12,7 @@
 #include"Effect/OreFragmentParticle.h"
 #include"Effect/OreBreakParticle.h"
 #include"Effect/DirtMoveParticle.h"
+#include"TimeTracker.h"
 
 class OreItemManager {
 public:
@@ -23,6 +24,8 @@ public:
 	void Draw(Window* window, const Matrix4x4& vpMatrix);
 
 	void DrawUI();
+
+	void DrawTimeUI(Window* window, const Matrix4x4& vpMatrix);
 
 	void DrawEffect(Window* window, const Matrix4x4& vpMatrix);
 
@@ -61,10 +64,18 @@ public:
 	// 泥沼のパーティクルを設定
 	void SetDirtParticleEmit();
 
+	// 時間管理クラスを取得
+	void SetTimeTracker(TimeTracker* timeTracker) {
+		timeTracker_ = timeTracker;
+	}
+
 private:
 
 	// マップの解釈昨日
 	MapChipField* MapChipField_ = nullptr;
+
+	// 時間管理
+	TimeTracker* timeTracker_ = nullptr;
 
 	// 鉱石の達
 	std::unordered_map<int32_t, std::unique_ptr<OreItem>> oreItems_;
@@ -117,6 +128,15 @@ private: // フォント機能
 		Vector3 fontPos = { 0,0,0 };
 	};
 
+	// 時間の追加UI
+	struct TimerData {
+		std::unique_ptr<FontObject> font3d;
+		std::unique_ptr<FontObject> font2d;
+		float startPosY_ = 0.0f;
+		bool isFinished_ = false;
+		float timer_ = 0.0f;
+	};
+
 	FontLoader* fontLoader_ = nullptr;
 	DrawData fontDrawData_;
 	DrawData spriteDrawData_;
@@ -125,5 +145,16 @@ private: // フォント機能
 	// フォントデータ
 	std::unordered_map<int32_t, TextData> fontList_;
 
+	// 時間追加の描画処理
+	std::list<TimerData> addTimerFontList_;
+
 	std::string fontName_;
+
+private:
+
+	// 時間の追加
+	void AddTimerUI(const Vector3& pos, OreType oreType);
+
+	// 時間を追加するUIの更新処理
+	void TimerUIUpdate();
 };

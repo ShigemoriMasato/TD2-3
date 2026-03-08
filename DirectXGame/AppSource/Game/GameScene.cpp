@@ -379,6 +379,9 @@ void GameScene::Initialize() {
 	timeTracker_ = std::make_unique<TimeTracker>();
 	timeTracker_->SetCountTime(mTime_, sTime_);
 
+	// 時間管理クラスを取得
+	oreItemManager_->SetTimeTracker(timeTracker_.get());
+
 	// 最初と最後のカウントをするUI
 	startCountUI_ = std::make_unique<StartCountUI>();
 	startCountUI_->Initialize(fontName, drawData, fontLoader_, commonData_->stageCount, "RampartOne-Regular.ttf");
@@ -929,6 +932,9 @@ void GameScene::Draw() {
 				} else {
 					// ゲームのUIを描画
 					gameUIManager_->Draw(gameWindow_->GetWindow(), vpMatrix2d, !miniMap_->PleasePose());
+
+					// 時間追加UIを描画
+					oreItemManager_->DrawTimeUI(gameWindow_->GetWindow(), vpMatrix2d);
 				}
 
 				// 操作UIを表示

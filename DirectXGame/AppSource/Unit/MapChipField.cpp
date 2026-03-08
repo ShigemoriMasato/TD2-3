@@ -398,7 +398,8 @@ std::vector<Vector3> MapChipField::GradeCalculatePath(const Vector3& start, cons
 			TileType nextTileType = GetBlockTypeByIndex(nx, nz);
 
 			// 壁チェック (Wallなら絶対に通れない)
-			if (nextTileType == TileType::Wall) {
+			if (nextTileType == TileType::Wall || nextTileType == TileType::Home || 
+				nextTileType == TileType::Gold || nextTileType == TileType::MediumGold || nextTileType == TileType::LargeGold) {
 				continue;
 			}
 

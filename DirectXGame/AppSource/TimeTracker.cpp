@@ -80,3 +80,33 @@ void TimeTracker::Update() {
 		TimeLimit::CreateNumbers();
 	}
 }
+
+void TimeTracker::AddRemainingTime(const float& seconds) {
+	initialDuration_ += std::chrono::duration<float>(seconds);
+
+	// 既に時間が0になって終了フラグが立っていた場合、時間がプラスに戻るならフラグを解除する
+	if (isFinished_) {
+		// 現在の総経過時間を計算
+		auto currentElapsed = accumulatedTime_;
+		if (isRunning_) {
+			currentElapsed += (std::chrono::high_resolution_clock::now() - startTime_);
+		}
+
+		// 新しい残り時間が0より大きければ終了フラグを解除
+		if ((initialDuration_ - currentElapsed).count() > 0.0f) {
+			isFinished_ = false;
+		}
+	}
+
+	// タイマーが停止中の場合は、即座に duration_ と画面表示を更新しておく
+	if (!isRunning_) {
+		duration_ = initialDuration_ - accumulatedTime_;
+
+		if (duration_.count() < 0.0f) {
+			duration_ = std::chrono::duration<float>::zero();
+		}
+
+		TimeLimit::totalSeconds = static_cast<int>(duration_.count());
+		TimeLimit::CreateNumbers();
+	}
+}

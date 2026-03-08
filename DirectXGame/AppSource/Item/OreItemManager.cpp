@@ -1,6 +1,7 @@
 #include"OreItemManager.h"
 #include"FpsCount.h"
 #include"RandomGenerator.h"
+#include"Utility/Easing.h"
 
 // 各鉱石
 #include"Object/GoldOre.h"
@@ -153,6 +154,9 @@ void OreItemManager::Update(bool isOpenMap) {
 			MapChipField::IndexSet index = MapChipField_->GetMapChipIndexSetByPosition(pos);
 			MapChipField_->SetMapChipBlockType(index.xIndex, index.zIndex, TileType::Air);
 
+			// 鉱石が壊れた時の時間を追加する
+			AddTimerUI(pos,ore->GetType());
+
 			// 破壊演出を起動
 			oreBreakParticle_->AddParticle(ore->GetPos());
 
@@ -202,6 +206,9 @@ void OreItemManager::Update(bool isOpenMap) {
 	// 演出の更新
 	oreBreakParticle_->Update();
 
+	// 時間追加のUI更新処理
+	TimerUIUpdate();
+
 	// 泥の演出を追加
 	if (!dirtDataList_.empty()) {
 
@@ -242,6 +249,12 @@ void OreItemManager::Draw(Window* window, const Matrix4x4& vpMatrix) {
 	if (!dirtDataList_.empty()) {
 		dirtMoveParticle_->Draw(window, vpMatrix);
 	}
+
+	// 時間の3DUIを描画する
+	for (auto& data : addTimerFontList_) {
+		if (data.isFinished_) { continue; }
+		data.font3d->Draw(window, vpMatrix);
+	}
 }
 
 void OreItemManager::DrawEffect(Window* window, const Matrix4x4& vpMatrix) {
@@ -250,6 +263,15 @@ void OreItemManager::DrawEffect(Window* window, const Matrix4x4& vpMatrix) {
 
 	// 鉱石の破壊表現を描画
 	oreBreakParticle_->Draw(window, vpMatrix);
+}
+
+void OreItemManager::DrawTimeUI(Window* window, const Matrix4x4& vpMatrix) {
+
+	// 時間の2DUIを描画する
+	for (auto& data : addTimerFontList_) {
+		if (data.isFinished_) { continue; }
+		data.font2d->Draw(window, vpMatrix);
+	}
 }
 
 void OreItemManager::DrawUI() {
@@ -432,4 +454,81 @@ bool OreItemManager::IsSelectOre(const Vector3 selectpos, Vector3& worldPos) {
 OreItem* OreItemManager::GetOreItemForId() {
 	// 選択した
 	return oreItems_[selectId_].get();
+}
+
+void OreItemManager::AddTimerUI(const Vector3& pos, OreType oreType) {
+
+	TimerData timerData;
+
+	std::wstring s;
+
+	// 鉱石の大きさによって追加する時間を変更する
+	switch (oreType)
+	{
+	case OreType::Large:
+		s = L"+3";
+		timeTracker_->AddRemainingTime(3.0f);
+		break;
+
+	case OreType::Medium:
+		s = L"+2";
+		timeTracker_->AddRemainingTime(2.0f);
+		break;
+
+	case OreType::Small:
+		s = L"+1";
+		timeTracker_->AddRemainingTime(1.0f);
+		break;
+	}
+
+	// 3dUI
+	timerData.font3d = std::make_unique<FontObject>();
+	timerData.font3d->Initialize(fontName_, s, fontDrawData_, fontLoader_);
+	timerData.font3d->transform_.position = pos;
+	timerData.font3d->transform_.position.x -= 0.8f;
+	timerData.font3d->transform_.position.y += 3.5f;
+	timerData.font3d->transform_.position.z += 0.4f;
+	timerData.font3d->transform_.rotate.x = -2.4f;
+	timerData.font3d->transform_.scale = Vector3(0.02f, -0.02f, 1.0f);
+	timerData.font3d->fontColor_ = { 0.0f,1.0f,1.0f,1.0f };
+	timerData.font3d->Update();
+
+	timerData.startPosY_ = pos.y;
+
+	// 2dUI
+	timerData.font2d = std::make_unique<FontObject>();
+	timerData.font2d->Initialize(fontName_, s, fontDrawData_, fontLoader_);
+	timerData.font2d->transform_.position = { 1200.0f,128.0f,0.0f };
+	timerData.font2d->transform_.scale = Vector3(0.8f, -0.8f, 1.0f);
+	timerData.font2d->fontColor_ = { 0.0f,1.0f,1.0f,1.0f };
+	timerData.font2d->Update();
+
+	// UIを登録する
+	addTimerFontList_.push_back(std::move(timerData));
+}
+
+void OreItemManager::TimerUIUpdate() {
+
+	// 終了フラグが立った敵を削除
+	addTimerFontList_.remove_if([](const TimerData& data) {
+		return data.isFinished_;
+	});
+
+	// 更新処理
+	for (auto& data : addTimerFontList_) {
+
+		data.timer_ += FpsCount::deltaTime / 1.0f;
+
+		data.font2d->transform_.position.y = lerp(180.0f, 80.0f, data.timer_, EaseType::EaseInCubic);
+
+		data.font3d->transform_.position.y = lerp(data.startPosY_,5.0f,data.timer_,EaseType::EaseInCubic);
+
+		// 更新処理
+		data.font2d->Update();
+		data.font3d->Update();
+
+		if (data.timer_ >= 1.0f) {
+			data.isFinished_ = true;
+		}
+	}
 }

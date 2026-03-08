@@ -29,6 +29,9 @@ public:
 	// 終了フラグを取得
 	bool isFinishd() const { return isFinished_;}
 
+	// 時間を加算する
+	void AddRemainingTime(const float& seconds);
+
 private:
 
 	// 最初の時間
