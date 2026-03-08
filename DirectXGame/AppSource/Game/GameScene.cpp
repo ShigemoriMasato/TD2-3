@@ -815,6 +815,18 @@ void GameScene::InGameScene() {
 			// クリックアニメーションを開始
 			cameraController_->StartAnimation();
 		}
+
+		// 左クリック長押しの場合
+		if (Input::GetMouseButtonState()[0] & 0x80) {
+
+			pressTimer_ += FpsCount::deltaTime / 0.5f;
+
+			if (pressTimer_ >= 1.0f) {
+				unitManager_->PressMovePlayer(cameraController_->GetWorldPos());
+			}
+		} else {
+			pressTimer_ = 0.0f;
+		}
 	}
 
 	//===================================================

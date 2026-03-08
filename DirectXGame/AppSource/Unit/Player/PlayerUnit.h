@@ -23,6 +23,9 @@ public:
 	// 移動する位置を設定する
 	void SetMovePos(const Vector3& targetPos);
 
+	// 長押しの移動
+	void SetPressMove(const Vector3& pos);
+
 public:
 
 	Vector3* GetPos() { return &object_->transform_.position; }
@@ -69,6 +72,7 @@ private:
 	std::vector<Vector3> path_;
 
 	bool isAutoMove_ = false;
+	bool isPress_ = false;
 
 	Vector3 targetPos_ = {};
 	

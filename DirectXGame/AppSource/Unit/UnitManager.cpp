@@ -237,6 +237,11 @@ void UnitManager::MovePlayer(const Vector3& pos) {
 	}
 }
 
+void UnitManager::PressMovePlayer(const Vector3& pos) {
+
+	playerUnit_->SetPressMove(pos);
+}
+
 void UnitManager::RegisterUnit(const Vector3& targetPos, const int32_t& spawnNum, const int32_t& excessNum, OreItem* oreItem) {
 
 	// 生成出来る最大の数を超えていれば、早期リターン

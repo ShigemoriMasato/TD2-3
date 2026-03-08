@@ -60,22 +60,39 @@ void PlayerUnit::Update() {
 
 	if (isAutoMove_) {
 
-		if (path_.empty()) {
-			isAutoMove_ = false;
-			//Vector3 toTarget = targetPos_ - object_->transform_.position;
-			//toTarget.y = 0.0f;
-			//// XZ平面での距離を計算
-			//float distance = std::sqrt(toTarget.x * toTarget.x + toTarget.z * toTarget.z);
-			//
-			//object_->transform_.position += (toTarget / distance) * speed_ * FpsCount::deltaTime;
-			//
-			//// 自動移動状態を解除する
-			//if (distance < 0.1f) {
-			//	isAutoMove_ = false;
-			//}
+		if (isPress_) {
+
+			// 移動方向
+			Vector3 dir = targetPos_ - object_->transform_.position;
+			dir.y = 0.0f;
+			dir_ = dir.Normalize();
+
+			// 速度を求める
+			velocity_ = dir_ * speed_ * FpsCount::deltaTime;
+
+			// 衝突判定情報を初期化
+			MapChipField::CollisionMapInfo collisionMapInfo;
+			// 移動量に速度の値をコピー
+			collisionMapInfo.move = velocity_;
+			collisionMapInfo.pos = object_->transform_.position;
+			collisionMapInfo.size = size_;
+
+			// マップ衝突判定
+			CheckMapCollision(collisionMapInfo);
+
+			// 移動
+			object_->transform_.position += collisionMapInfo.move;
+
+			// 回転処理
+			Rotate();
+
 		} else {
-			// 自動移動
-			AutoMove();
+			if (path_.empty()) {
+				isAutoMove_ = false;
+			} else {
+				// 自動移動
+				AutoMove();
+			}
 		}
 
 		// 自動回転
@@ -93,6 +110,8 @@ void PlayerUnit::Update() {
 		if (key[Key::Up] || key[Key::Down] || key[Key::Left] || key[Key::Right]) {
 			isAutoMove_ = false;
 		}
+
+		isPress_ = false;
 
 	} else {
 
@@ -358,6 +377,14 @@ void PlayerUnit::SetMovePos(const Vector3& targetPos) {
 	targetPos_ = targetPos;
 	// 経路を設定
 	CalculatePath(targetPos);
+}
+
+void PlayerUnit::SetPressMove(const Vector3& pos) {
+	isAutoMove_ = true;
+	targetPos_ = pos;
+	isPress_ = true;
+
+	path_.clear();
 }
 
 void PlayerUnit::AutoMove() {

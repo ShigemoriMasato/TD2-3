@@ -58,6 +58,12 @@ public:
 	void MovePlayer(const Vector3& pos);
 
 	/// <summary>
+	/// 長押しによるプレイヤーの移動
+	/// </summary>
+	/// <param name="pos"></param>
+	void PressMovePlayer(const Vector3& pos);
+
+	/// <summary>
 	/// ユニットを出動させる
 	/// </summary>
 	/// <param name="targetPos">移動する目標位置</param>
