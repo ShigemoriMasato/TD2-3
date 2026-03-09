@@ -259,6 +259,15 @@ void OreUnit::Update() {
 		}
 	}
 
+	// 鉱石を撮った後のクールタイム
+	if (isCoolActive_) {
+		coolTimer_ += FpsCount::deltaTime;
+
+		if (coolTimer_ >= 1.0f) {
+			isCoolActive_ = false;
+			coolTimer_ = 0.0f;
+		}
+	}
 }
 
 void OreUnit::Draw(Window* window, const Matrix4x4& vpMatrix) {
@@ -336,7 +345,7 @@ void OreUnit::OnCollision(Collider* other) {
 	// ユニット
 	if (isUnit) {
 		if (state_ != State::GoTo && state_ != State::ToDeliver) { return; }
-		if (isCoolTimeEnd_) { return; }
+		if (isCoolTimeEnd_ || isCoolActive_) { return; }
 
 		OreUnit* oreUnit = dynamic_cast<OreUnit*>(other);
 
@@ -400,6 +409,7 @@ void OreUnit::MiningUpdate() {
 	if (timer_ >= 1.0f) {
 		timer_ = 0.0f;
 		stateRequest_ = State::ToDeliver;
+		isCoolActive_ = true;
 	}
 }
 

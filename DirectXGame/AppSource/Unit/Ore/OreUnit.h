@@ -178,6 +178,10 @@ private:
 	// ダメー字パラメータ
 	int32_t damageParam_ = 0;
 
+	// 鉱石を取ったあとのクールタイム
+	float coolTimer_ = 0.0f;
+	bool isCoolActive_ = false;
+
 	/// 音声
 
 	// 納品音声
