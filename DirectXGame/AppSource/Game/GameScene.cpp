@@ -354,10 +354,11 @@ void GameScene::Initialize() {
 	// icon
 	int oreItemTextureIndex = textureManager_->GetTexture("OreItem.png");
 	int oreiTextureIndex = textureManager_->GetTexture("Ore.png");
+	int clockIconiTextureIndex = textureManager_->GetTexture("Clock.png");
 
 	// ゲームのUI管理クラス
 	gameUIManager_ = std::make_unique<GameUIManager>();
-	gameUIManager_->Initialize(drawDataManager_->GetDrawData(spriteModel.drawDataIndex), starTextureIndex, lineTextureIndex, oreiTextureIndex, oreItemTextureIndex,
+	gameUIManager_->Initialize(drawDataManager_->GetDrawData(spriteModel.drawDataIndex), starTextureIndex, lineTextureIndex, oreiTextureIndex, oreItemTextureIndex, clockIconiTextureIndex,
 		fontName, drawData, fontLoader_,
 		commonData_->stageCount);
 

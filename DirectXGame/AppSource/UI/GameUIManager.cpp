@@ -6,7 +6,7 @@
 #include"Utility/Easing.h"
 #include"Assets/Audio/AudioManager.h"
 
-void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTexture, int oreIcon, int itemIcon,const std::string& fontName, DrawData fontData, FontLoader* fontLoader, int florNum) {
+void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTexture, int oreIcon, int itemIcon, int clockIcon, const std::string& fontName, DrawData fontData, FontLoader* fontLoader, int florNum) {
 	fontLoader_ = fontLoader;
 
 	// ユニットの数UI
@@ -53,6 +53,14 @@ void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTex
 	itemIconSpriteObject_->color_ = { 1.0f,1.0f,1.0f,1.0f };
 	itemIconSpriteObject_->SetTexture(itemIcon);
 	itemIconSpriteObject_->Update();
+	// 時計icon
+	clockIconSpriteObject_ = std::make_unique<SpriteObject>();
+	clockIconSpriteObject_->Initialize(spriteData, { 64.0f,64.0f });
+	clockIconSpriteObject_->transform_.position = { 640.0f,360.0f,0.0f };
+	clockIconSpriteObject_->color_ = { 1.0f,1.0f,1.0f,1.0f };
+	clockIconSpriteObject_->SetTexture(clockIcon);
+	clockIconSpriteObject_->Update();
+
 
 	floorFontObject_ = std::make_unique<FontObject>();
 	floorFontObject_->Initialize(fontName, L"フロア" + std::to_wstring(florNum), fontData, fontLoader);
@@ -165,6 +173,7 @@ void GameUIManager::Draw(Window* window, const Matrix4x4& vpMatrix, bool isDrawE
 	// アイコン描画
 	oreIconSpriteObject_->Draw(window, vpMatrix);
 	itemIconSpriteObject_->Draw(window, vpMatrix);
+	clockIconSpriteObject_->Draw(window, vpMatrix);
 
 	// 説明文字を描画
 	quotaFontObject_->Draw(window, vpMatrix);
@@ -222,6 +231,8 @@ void GameUIManager::RegisterDebugParam() {
 	GameParamEditor::GetInstance()->AddItem("GameUIManager", "OreUnitIconSize", oreIconSpriteObject_->transform_.scale, i++);
 	GameParamEditor::GetInstance()->AddItem("GameUIManager", "OreItemIconPos", itemIconSpriteObject_->transform_.position, i++);
 	GameParamEditor::GetInstance()->AddItem("GameUIManager", "OreItemIconSize", itemIconSpriteObject_->transform_.scale, i++);
+	GameParamEditor::GetInstance()->AddItem("GameUIManager", "ClockIconPos", clockIconSpriteObject_->transform_.position, i++);
+	GameParamEditor::GetInstance()->AddItem("GameUIManager", "ClockIconSize", clockIconSpriteObject_->transform_.scale, i++);
 
 	GameParamEditor::GetInstance()->AddItem("QuotaClearEffect", "Pos", quotaClearEffectUI_->pos_);
 }
@@ -254,6 +265,8 @@ void GameUIManager::ApplyDebugParam() {
 	oreIconSpriteObject_->transform_.scale = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "OreUnitIconSize");
 	itemIconSpriteObject_->transform_.position = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "OreItemIconPos");
 	itemIconSpriteObject_->transform_.scale = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "OreItemIconSize");
+	clockIconSpriteObject_->transform_.position = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "ClockIconPos");
+	clockIconSpriteObject_->transform_.scale = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "ClockIconSize");
 
 	quotaClearEffectUI_->pos_ = GameParamEditor::GetInstance()->GetValue<Vector3>("QuotaClearEffect", "Pos");
 	collectEffectUI_->pos_ = quotaClearEffectUI_->pos_;
@@ -264,6 +277,7 @@ void GameUIManager::ApplyDebugParam() {
 	// icon
 	oreIconSpriteObject_->Update();
 	itemIconSpriteObject_->Update();
+	clockIconSpriteObject_->Update();
 
 	//oreItemUI_->Update(0,20);
 }

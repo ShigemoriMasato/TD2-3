@@ -9,7 +9,7 @@
 class GameUIManager {
 public:
 
-	void Initialize(DrawData spriteData,int starTexture,int lineTexture,int oreIcon,int itemIcon,const std::string& fontName, DrawData fontData, FontLoader* fontLoader,int florNum);
+	void Initialize(DrawData spriteData,int starTexture,int lineTexture,int oreIcon,int itemIcon,int clockIcon,const std::string& fontName, DrawData fontData, FontLoader* fontLoader,int florNum);
 
 	void Update(const int32_t& unitNum,const int32_t& maxUnitNum);
 
@@ -47,6 +47,7 @@ private:
 	// アイコン画像
 	std::unique_ptr<SpriteObject> oreIconSpriteObject_;
 	std::unique_ptr<SpriteObject> itemIconSpriteObject_;
+	std::unique_ptr<SpriteObject> clockIconSpriteObject_;
 
 	// 階層名前
 	std::unique_ptr<FontObject> floorFontObject_;
