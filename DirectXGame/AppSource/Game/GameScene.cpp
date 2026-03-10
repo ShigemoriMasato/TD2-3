@@ -943,12 +943,14 @@ void GameScene::Draw() {
 						// 衝突位置アイコンを描画
 						unitMarkUIManager_->DrawUI(gameWindow_->GetWindow(), vpMatrix2d);
 				} else {
-					// ゲームのUIを描画
-					gameUIManager_->Draw(gameWindow_->GetWindow(), vpMatrix2d, !miniMap_->PleasePose());
+					
 
 					// 時間追加UIを描画
 					oreItemManager_->DrawTimeUI(gameWindow_->GetWindow(), vpMatrix2d);
 				}
+
+				// ゲームのUIを描画
+				gameUIManager_->Draw(gameWindow_->GetWindow(), vpMatrix2d, !miniMap_->PleasePose());
 
 				// 操作UIを表示
 				pauseUI_->DrawGuideUI(gameWindow_->GetWindow(), vpMatrix2d);
