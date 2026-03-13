@@ -938,13 +938,12 @@ void GameScene::Draw() {
 					// 拠点アイコン
 					homeManager_->DrawIcon(gameWindow_->GetWindow(), vpMatrix2d);
 					// ユニットアイコンを描画
-						unitManager_->DrawIcon(gameWindow_->GetWindow(), vpMatrix2d);
+					unitManager_->DrawIcon(gameWindow_->GetWindow(), vpMatrix2d);
 
-						// 衝突位置アイコンを描画
-						unitMarkUIManager_->DrawUI(gameWindow_->GetWindow(), vpMatrix2d);
+					// 衝突位置アイコンを描画
+					unitMarkUIManager_->DrawUI(gameWindow_->GetWindow(), vpMatrix2d);
 				} else {
 					
-
 					// 時間追加UIを描画
 					oreItemManager_->DrawTimeUI(gameWindow_->GetWindow(), vpMatrix2d);
 				}

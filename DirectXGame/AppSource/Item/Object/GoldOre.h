@@ -78,7 +78,7 @@ public:
 
 	// デバック情報
 	int32_t GetCurrentWorkerNum() override { return currentWorkerNum_; }
-	int32_t GetMaxWorkerNum() override { return maxWorkerNum_; }
+	int32_t GetMaxWorkerNum() override { return std::min(hp_,maxWorkerNum_); }
 	int32_t GetMaxHp() override { return hp_; }
 	int32_t GetHp() override { return maxHp_; }
 	bool IsChangeHp() override { return isChangeHp_; }
