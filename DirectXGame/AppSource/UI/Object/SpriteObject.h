@@ -30,6 +30,11 @@ public:
 		texture_ = texutre;
 	}
 
+	// 親を設定
+	void SetParent(Matrix4x4* parent) {
+		parent_ = parent;
+	}
+
 public:
 
 	// srt
@@ -39,6 +44,8 @@ public:
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	uint32_t texture_ = 0;
+
+	Matrix4x4* parent_ = nullptr;
 
 private:
 

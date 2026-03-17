@@ -9,24 +9,33 @@
 void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTexture, int oreIcon, int itemIcon, int clockIcon, const std::string& fontName, DrawData fontData, FontLoader* fontLoader, int florNum) {
 	fontLoader_ = fontLoader;
 
+	transform_.position = {0.0f,0.0f,0.0f};
+	transform_.rotate = {0.0f,0.0f,0.0f};
+	transform_.scale = {1.0f,1.0f,1.0f};
+	worldMatrix_ = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
+
 	// ユニットの数UI
 	unitCounterUI_ = std::make_unique<CounterUI>();
+	unitCounterUI_->SetParent(&worldMatrix_);
 	unitCounterUI_->Initialize(fontName, 0, 10, fontData, fontLoader_);
 	unitCounterUI_->pos_.x = 800.0f;
 	unitCounterUI_->pos_.y = 128.0f;
 
 	// 鉱石のアイテムUI
 	oreItemUI_ = std::make_unique<CounterUI>();
+	oreItemUI_->SetParent(&worldMatrix_);
 	oreItemUI_->Initialize(fontName, OreItemStorageNum::currentOreItemNum_, OreItemStorageNum::maxOreItemNum_, fontData, fontLoader_);
 	oreItemUI_->pos_.x = 800.0f;
 	oreItemUI_->pos_.y = 200.0f;
 
 	// 時間を表示するUI
 	timerUI_ = std::make_unique<TimerUI>();
+	timerUI_->SetParent(&worldMatrix_);
 	timerUI_->Initialize(fontName, fontData, fontLoader_);
 
 	// 描画機能の初期化
 	upSpriteObject_ = std::make_unique<SpriteObject>();
+	upSpriteObject_->SetParent(&worldMatrix_);
 	upSpriteObject_->Initialize(spriteData, { 360.0f,96.0f });
 	upSpriteObject_->transform_.position = { 640.0f,360.0f,0.0f };
 	upSpriteObject_->color_ = { 0.1f,0.1f,0.1f,1.0f };
@@ -34,6 +43,7 @@ void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTex
 
 	// 描画機能の初期化
 	downSpriteObject_ = std::make_unique<SpriteObject>();
+	downSpriteObject_->SetParent(&worldMatrix_);
 	downSpriteObject_->Initialize(spriteData, { 360.0f,96.0f });
 	downSpriteObject_->transform_.position = { 640.0f,360.0f,0.0f };
 	downSpriteObject_->color_ = { 0.1f,0.1f,0.1f,1.0f };
@@ -41,6 +51,7 @@ void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTex
 
 	// icon
 	oreIconSpriteObject_ = std::make_unique<SpriteObject>();
+	oreIconSpriteObject_->SetParent(&worldMatrix_);
 	oreIconSpriteObject_->Initialize(spriteData, { 64.0f,64.0f });
 	oreIconSpriteObject_->transform_.position = { 640.0f,360.0f,0.0f };
 	oreIconSpriteObject_->color_ = { 1.0f,1.0f,1.0f,1.0f };
@@ -48,6 +59,7 @@ void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTex
 	oreIconSpriteObject_->Update();
 	// icon
 	itemIconSpriteObject_ = std::make_unique<SpriteObject>();
+	itemIconSpriteObject_->SetParent(&worldMatrix_);
 	itemIconSpriteObject_->Initialize(spriteData, { 64.0f,64.0f });
 	itemIconSpriteObject_->transform_.position = { 640.0f,360.0f,0.0f };
 	itemIconSpriteObject_->color_ = { 1.0f,1.0f,1.0f,1.0f };
@@ -55,6 +67,7 @@ void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTex
 	itemIconSpriteObject_->Update();
 	// 時計icon
 	clockIconSpriteObject_ = std::make_unique<SpriteObject>();
+	clockIconSpriteObject_->SetParent(&worldMatrix_);
 	clockIconSpriteObject_->Initialize(spriteData, { 64.0f,64.0f });
 	clockIconSpriteObject_->transform_.position = { 640.0f,360.0f,0.0f };
 	clockIconSpriteObject_->color_ = { 1.0f,1.0f,1.0f,1.0f };
@@ -63,12 +76,15 @@ void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTex
 
 
 	floorFontObject_ = std::make_unique<FontObject>();
+	floorFontObject_->SetParent(&worldMatrix_);
 	floorFontObject_->Initialize(fontName, L"フロア" + std::to_wstring(florNum), fontData, fontLoader);
 
 	quotaFontObject_ = std::make_unique<FontObject>();
+	quotaFontObject_->SetParent(&worldMatrix_);
 	quotaFontObject_->Initialize(fontName, L"ノルマ", fontData, fontLoader);
 
 	unitFontObject_ = std::make_unique<FontObject>();
+	unitFontObject_->SetParent(&worldMatrix_);
 	unitFontObject_->Initialize(fontName, L"ユニット", fontData, fontLoader);
 
 	// ノルマクリアUI
@@ -92,6 +108,8 @@ void GameUIManager::Update(const int32_t& unitNum, const int32_t& maxUnitNum) {
 #ifdef USE_IMGUI
 	ApplyDebugParam();
 #endif
+
+	worldMatrix_ = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
 
 	// ユニットの残り数によって色を変更
 	if (unitNum <= 0) {
@@ -234,6 +252,9 @@ void GameUIManager::RegisterDebugParam() {
 	GameParamEditor::GetInstance()->AddItem("GameUIManager", "ClockIconPos", clockIconSpriteObject_->transform_.position, i++);
 	GameParamEditor::GetInstance()->AddItem("GameUIManager", "ClockIconSize", clockIconSpriteObject_->transform_.scale, i++);
 
+	GameParamEditor::GetInstance()->AddItem("GameUIManager", "BasePos", transform_.position, i++);
+	GameParamEditor::GetInstance()->AddItem("GameUIManager", "BaseSize", transform_.scale, i++);
+
 	GameParamEditor::GetInstance()->AddItem("QuotaClearEffect", "Pos", quotaClearEffectUI_->pos_);
 }
 
@@ -259,6 +280,9 @@ void GameUIManager::ApplyDebugParam() {
 	quotaFontObject_->transform_.scale = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "QuotaFontSize");
 	unitFontObject_->transform_.position = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "UnitFontPos");
 	unitFontObject_->transform_.scale = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "UnitFontSize");
+
+	transform_.position = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "BasePos");
+	transform_.scale = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "BaseSize");
 
 	// icon
 	oreIconSpriteObject_->transform_.position = GameParamEditor::GetInstance()->GetValue<Vector3>("GameUIManager", "OreUnitIconPos");

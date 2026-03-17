@@ -67,6 +67,9 @@ void FontObject::Draw(Window* window, const Matrix4x4& vpMatrix) {
 
 	// ワールド行列の計算
 	matrices_[0] = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
+	if (parent_) {
+		matrices_[0] *= *parent_;
+	}
 	matrices_[1] = vpMatrix;
 
 	// バッファにデータをコピー

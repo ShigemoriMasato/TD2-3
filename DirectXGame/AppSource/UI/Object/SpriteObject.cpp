@@ -41,6 +41,9 @@ void SpriteObject::Initialize(DrawData drawData, const Vector2& size, BlendState
 void SpriteObject::Update() {
 	// worldTransformを更新
 	worldMatrix_ = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
+	if (parent_) {
+		worldMatrix_ *= *parent_;
+	}
 	cBuffData_.color = color_;
 	cBuffData_.textureIndex_ = texture_;
 	//cBuffData_.uvMatrix;

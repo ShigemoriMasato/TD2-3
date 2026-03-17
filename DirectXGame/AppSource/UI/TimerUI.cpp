@@ -12,6 +12,11 @@ void TimerUI::Initialize(const std::string& fontName, DrawData drawData, FontLoa
 	numFont_->Initialize(fontName, std::to_wstring(TimeLimit::totalSeconds), drawData, fontLoader);
 	numFont_->transform_.position.x = pos_.x;
 	numFont_->transform_.position.y = pos_.y;
+
+	// 親を設定
+	if (parent_) {
+		numFont_->SetParent(parent_);
+	}
 }
 
 void TimerUI::Update() {

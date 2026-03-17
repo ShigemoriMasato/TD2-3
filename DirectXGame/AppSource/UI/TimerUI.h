@@ -15,6 +15,11 @@ public:
 		preTime_ = time;
 	}
 
+	// 親を設定する
+	void SetParent(Matrix4x4* parent) {
+		parent_ = parent;
+	}
+
 public:
 
 	Vector3 pos_ = {500.0f,128.0f,0.0f};
@@ -31,6 +36,8 @@ private:
 
 	// 色
 	Vector4 fontColor_ = { 0.8f,0.8f,0.0f,1.0f };
+
+	Matrix4x4* parent_ = nullptr;
 
 	int preTime_ = 0;
 

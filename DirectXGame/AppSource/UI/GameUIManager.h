@@ -64,6 +64,10 @@ private:
 	// 収集演出
 	std::unique_ptr<CollectEffectUI> collectEffectUI_;
 
+	// 基準点
+	Transform transform_;
+	Matrix4x4 worldMatrix_;
+
 	float alertTImer_ = 0.0f;
 	
 	uint32_t timeSH_ = 0;

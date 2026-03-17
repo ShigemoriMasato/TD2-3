@@ -21,6 +21,12 @@ void CounterUI::Initialize(const std::string& fontName, int32_t curNum, int32_t 
 	maxnumFontObject_ = std::make_unique<FontObject>();
 	maxnumFontObject_->Initialize(fontName, s, drawData, fontLoader);
 	maxnumFontObject_->transform_.scale = { 0.8f,-0.8f,1.0f };
+
+	// 親を設定
+	if (parent_) {
+		fontObject_->SetParent(parent_);
+		maxnumFontObject_->SetParent(parent_);
+	}
 }
 
 void CounterUI::Update(int32_t curNum, int32_t maxNum) {

@@ -19,6 +19,10 @@ public:
 		}
 	}
 
+	void SetParent(Matrix4x4* parent) {
+		parent_ = parent;
+	}
+
 public:
 
 	Vector3 pos_;
@@ -48,6 +52,8 @@ private:
 	float textSize_ = 64.0f;
 
 	bool isNumChanged_ = false;
+
+	Matrix4x4* parent_ = nullptr;
 
 private:
 

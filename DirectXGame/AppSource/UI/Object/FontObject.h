@@ -53,6 +53,10 @@ public:
 	//0..左上、1...右下
 	void AnchorPoint(Vector2 anchor) { anchor_ = anchor; };
 
+	void SetParent(Matrix4x4* parent) {
+		parent_ = parent;
+	}
+
 public:
 
 	// トランスフォーム
@@ -83,6 +87,8 @@ private:
 	bool isDirty_ = true;	
 
 	FontLoader* fontLoader_ = nullptr;
+
+	Matrix4x4* parent_ = nullptr;
 
 	Vector2 anchor_;
 	Vector2 offset_{};
