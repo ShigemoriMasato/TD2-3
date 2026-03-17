@@ -19,7 +19,7 @@ void CameraController::Initialize(Input* input, DrawData drawData, int texture) 
 	// カメラを初期化
 	this->SetProjectionMatrix(PerspectiveFovDesc{});
 	position_ = { 0.0f,8.0f,0.0f };
-	rotation_ = { -1.0f,0.0f,0.0f };
+	rotation_ = { -1.17f,0.0f,0.0f };
 	MakeMatrix();
 
 	// クリック位置を描画
