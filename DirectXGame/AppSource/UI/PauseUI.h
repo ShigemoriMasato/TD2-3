@@ -10,7 +10,7 @@ public:
 
 	void Initialize(DrawData drawData,uint32_t texture, KeyManager* keyManager,
 		const std::string& fontName, DrawData fontDrawData, FontLoader* fontLoader,
-		int baTex,int guidTex,int selTex,int log);
+		int baTex,int guidTex,int selTex,int log,int tab);
 
 	void Update();
 
@@ -68,6 +68,10 @@ private:
 
 	// ポーズロゴ
 	std::unique_ptr<SpriteObject> logSprite_;
+
+	// tab画像UI
+	std::unique_ptr<SpriteObject> tabSprite_;
+	Vector2 tabSize_ = { 180,64.0f };
 
 	/// 音声
 

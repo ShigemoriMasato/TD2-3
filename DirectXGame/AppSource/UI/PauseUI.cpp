@@ -6,7 +6,7 @@
 
 void PauseUI::Initialize(DrawData drawData, uint32_t texture, KeyManager* keyManager,
 	const std::string& fontName, DrawData fontDrawData, FontLoader* fontLoader,
-	int baTex, int guidTex, int selTex, int log) {
+	int baTex, int guidTex, int selTex, int log, int tab) {
 	keyManager_ = keyManager;
 
 	// 描画機能の初期化
@@ -67,6 +67,13 @@ void PauseUI::Initialize(DrawData drawData, uint32_t texture, KeyManager* keyMan
 	guideSprite_->SetTexture(texture);
 	guideSprite_->Update();
 
+	// TabUI
+	tabSprite_ = std::make_unique<SpriteObject>();
+	tabSprite_->Initialize(drawData, tabSize_);
+	tabSprite_->transform_.position = { 140.0f,650.0f,0.0f };
+	tabSprite_->color_ = { 1.0f,1.0f,1.0f,1.0f };
+	tabSprite_->SetTexture(tab);
+	tabSprite_->Update();
 
 	/// 音声
 
@@ -114,6 +121,7 @@ void PauseUI::Update() {
 	// 背景画像の更新処理
 	bgSpriteObject_->Update();
 	logSprite_->Update();
+	tabSprite_->Update();
 }
 
 void PauseUI::Draw(Window* window, const Matrix4x4& vpMatrix) {
@@ -133,7 +141,8 @@ void PauseUI::Draw(Window* window, const Matrix4x4& vpMatrix) {
 		}
 		
 	} else {
-		gameOverFontObject_->Draw(window, vpMatrix);
+		//gameOverFontObject_->Draw(window, vpMatrix);
+		tabSprite_->Draw(window, vpMatrix);
 	}
 }
 
@@ -186,41 +195,48 @@ void PauseUI::InUpdate() {
 
 	if (isOpenPause_) {
 
-		if (key[Key::Decision] || ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80))) {
-
-			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
-				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
+		if (isGuideOpen_) {
+			if (key[Key::Decision] || ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80))) {
+				isGuideOpen_ = false;
 			}
-			timer_ = 0.0f;
+		} else {
+			if (key[Key::Decision] || ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80))) {
 
-			// 決定
-			if (selectNum_ == 0) {
+				if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
+					AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
+				}
+				timer_ = 0.0f;
+
+				// 決定
+				if (selectNum_ == 0) {
+					onRetryClicked_();
+					isAnimation_ = true;
+					isOpenPause_ = false;
+					// 戻る処理
+					if (!isOpenPause_) {
+						selectNum_ = 0;
+					}
+					isGuideOpen_ = false;
+				} else if (selectNum_ == 1) {
+					isGuideOpen_ = true;
+				} else {
+					onSelectClicked_();
+				}
+
+			} else if (key[Key::DecisionPause]) {
+				if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
+					AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
+				}
+				timer_ = 0.0f;
+				// tabで元にモデル
 				onRetryClicked_();
 				isAnimation_ = true;
-				isOpenPause_ = !isOpenPause_;
+				isGuideOpen_ = false;
+				isOpenPause_ = false;
 				// 戻る処理
 				if (!isOpenPause_) {
 					selectNum_ = 0;
 				}
-			} else if (selectNum_ == 1) {
-				isGuideOpen_ = !isGuideOpen_;
-			} else {
-				onSelectClicked_();
-			}
-
-		} else if (key[Key::DecisionPause]) {
-			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
-				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
-			}
-			timer_ = 0.0f;
-		    // tabで元にモデル
-			onRetryClicked_();
-			isAnimation_ = true;
-			isGuideOpen_ = false;
-			isOpenPause_ = !isOpenPause_;
-			// 戻る処理
-			if (!isOpenPause_) {
-				selectNum_ = 0;
 			}
 		}
 	} else {
@@ -232,8 +248,33 @@ void PauseUI::InUpdate() {
 			timer_ = 0.0f;
 			onRetryClicked_();
 			isAnimation_ = true;
-			isOpenPause_ = !isOpenPause_;
-		}
+			isOpenPause_ = true;
+		 }
+
+		 // tab画像の選択
+		 if ((tabSprite_->transform_.position.x - 128.0f <= screenPos.x &&
+			 tabSprite_->transform_.position.x + 128.0f >= screenPos.x) &&
+			 (tabSprite_->transform_.position.y - 32.0f <= screenPos.y &&
+				 tabSprite_->transform_.position.y + 32.0f >= screenPos.y)) {
+			 // サイズ
+			 tabSprite_->transform_.scale.x = tabSize_.x * 1.5f;
+			 tabSprite_->transform_.scale.y = tabSize_.y * 1.5f;
+
+			 // 左クリック
+			 if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
+				 if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
+					 AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
+				 }
+				 timer_ = 0.0f;
+				 onRetryClicked_();
+				 isAnimation_ = true;
+				 isOpenPause_ = true;
+			 }
+		 } else {
+			 // サイズ
+			 tabSprite_->transform_.scale.x = tabSize_.x;
+			 tabSprite_->transform_.scale.y = tabSize_.y;
+		 }
 	}
 }
 
