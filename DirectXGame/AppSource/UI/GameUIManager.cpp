@@ -140,6 +140,7 @@ void GameUIManager::Update(const int32_t& unitNum, const int32_t& maxUnitNum) {
 		if (oreItemUI_->IsNumChanged()) {
 			collectEffectUI_->StartAnimation();
 		}
+
 	} else {
 
 		// ノルマを達成せずに、30秒経過
@@ -180,6 +181,26 @@ void GameUIManager::Update(const int32_t& unitNum, const int32_t& maxUnitNum) {
 
 	// 回収演出の更新処理
 	collectEffectUI_->Update();
+}
+
+void GameUIManager::StopUpdate() {
+	alertTImer_ += FpsCount::deltaTime;
+
+	if (alertTImer_ <= 0.5f) {
+		float localT = alertTImer_ / 0.5f;
+
+		upSpriteObject_->color_ = lerp(bgColor_, Vector4(0.8f, 0.8f, 0.0f, 1.0f), localT, EaseType::EaseInCubic);
+
+	} else {
+		float localT = (alertTImer_ - 0.5f) / 0.5f;
+		upSpriteObject_->color_ = lerp(Vector4(0.8f, 0.8f, 0.0f, 1.0f), bgColor_, localT, EaseType::EaseOutCubic);
+	}
+
+	if (alertTImer_ >= 1.0f) {
+		alertTImer_ = 0.0f;
+		upSpriteObject_->color_ = bgColor_;
+	}
+	upSpriteObject_->Update();
 }
 
 void GameUIManager::Draw(Window* window, const Matrix4x4& vpMatrix, bool isDrawEffect) {

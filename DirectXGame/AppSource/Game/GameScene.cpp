@@ -553,6 +553,8 @@ std::unique_ptr<IScene> GameScene::Update() {
 			if (!isActiveMinMap_) {
 				// ゲームの更新処理
 				InGameScene();
+			} else {
+				gameUIManager_->StopUpdate();
 			}
 
 			// 鉱石管理の更新処理

@@ -13,6 +13,9 @@ public:
 
 	void Update(const int32_t& unitNum,const int32_t& maxUnitNum);
 
+	// 止めている状態の更新処理
+	void StopUpdate();
+
 	void Draw(Window* window, const Matrix4x4& vpMatrix, bool isDrawEffect);
 
 public:
