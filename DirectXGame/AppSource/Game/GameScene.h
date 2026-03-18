@@ -152,6 +152,11 @@ private:
 	uint32_t timeUpSH_ = 0;
 	bool isPlayTimeUpSH_ = false;
 
+	// 操作ガイドUI
+	std::unique_ptr<SpriteObject> guideSprite_;
+	// 開く
+	bool isOpenGuide_ = false;
+
 	//================================================
 	// ゲームオーバーシーン
 	//================================================

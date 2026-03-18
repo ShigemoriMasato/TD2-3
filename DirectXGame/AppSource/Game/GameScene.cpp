@@ -451,6 +451,29 @@ void GameScene::Initialize() {
 	logger->info("-- Stage {} --");
 	logger->info("MaxOreNum: {}\tKillOreNum: {}\tGetOreNum: {}\tMaxGoldNum: {}\tSumGoldNum: {}\n", 
 		commonData_->maxOreNum, commonData_->killOreNum, commonData_->getOreNum, commonData_->maxGoldNum, commonData_->sumGoldNum_);
+
+
+	/// チュートリアル
+	int guidTextureIndex = textureManager_->GetTexture("TutrialImage.png");
+
+	//==============================================================================
+	// 操作説明
+	//==============================================================================
+
+	// 操作UI
+	guideSprite_ = std::make_unique<SpriteObject>();
+	guideSprite_->Initialize(drawDataManager_->GetDrawData(spriteModel.drawDataIndex), { 1280,720.0f });
+	guideSprite_->transform_.position = { 640.0f,360.0f,0.0f };
+	guideSprite_->color_ = { 1.0f,1.0f,1.0f,1.0f };
+	guideSprite_->SetTexture(guidTextureIndex);
+	guideSprite_->Update();
+
+
+	if (commonData_->nextStageIndex == 0) {
+		isOpenGuide_ = true;
+	} else {
+		isOpenGuide_ = false;
+	}
 }
 
 void GameScene::InitializeOtherScene() {
@@ -532,6 +555,7 @@ void GameScene::InitializeOtherScene() {
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
+
 	//! ====================================================
 	//! 更新処理まとめ
 	//! ====================================================
@@ -545,25 +569,35 @@ std::unique_ptr<IScene> GameScene::Update() {
 		fadeTransition_->Update();
 
 	} else {
-		if (!isPauseScene_ && startCountUI_->isStartAnimeEnd()) {
 
-			// ミニマップの更新処理
-			miniMap_->Update();
+		if (!isOpenGuide_) {
 
-			if (!isActiveMinMap_) {
-				// ゲームの更新処理
-				InGameScene();
-			} else {
-				gameUIManager_->StopUpdate();
+			if (!isPauseScene_ && startCountUI_->isStartAnimeEnd()) {
+
+				// ミニマップの更新処理
+				miniMap_->Update();
+
+				if (!isActiveMinMap_) {
+					// ゲームの更新処理
+					InGameScene();
+				} else {
+					gameUIManager_->StopUpdate();
+				}
+
+				// 鉱石管理の更新処理
+				oreItemManager_->Update(isActiveMinMap_);
 			}
 
-			// 鉱石管理の更新処理
-			oreItemManager_->Update(isActiveMinMap_);
-		}
+			if (!isGameOver_ && !isGameClear_ && startCountUI_->isStartAnimeEnd()) {
+				// ポーズシーンの更新処理
+				pauseUI_->Update();
+			}
+		} else {
 
-		if (!isGameOver_ && !isGameClear_ && startCountUI_->isStartAnimeEnd()) {
-			// ポーズシーンの更新処理
-			pauseUI_->Update();
+			// 左クリック
+			if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
+				isOpenGuide_ = false;
+			}
 		}
 	}
 
@@ -677,6 +711,8 @@ void GameScene::CommonUpdate() {
 		DebugMousePos::screenMousePos = { static_cast<float>(cursorPos.x), static_cast<float>(cursorPos.y) };
 	}
 #pragma endregion
+
+	if (isOpenGuide_) { return; }
 
 	//===========================================================
 	// 時間計測処理
@@ -972,6 +1008,14 @@ void GameScene::Draw() {
 
 			// クリアシーンの更新処理
 			clearUI_->Draw(gameWindow_->GetWindow(), vpMatrix2d);
+
+
+
+			// 操作説明
+			if (isOpenGuide_) {
+				guideSprite_->Draw(gameWindow_->GetWindow(), vpMatrix2d);
+			}
+
 
 			// シーン遷移の描画
 			fadeTransition_->Draw(gameWindow_->GetWindow(), vpMatrix2d);
