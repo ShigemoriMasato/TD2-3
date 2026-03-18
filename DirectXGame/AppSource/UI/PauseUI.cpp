@@ -257,8 +257,8 @@ void PauseUI::InUpdate() {
 			 (tabSprite_->transform_.position.y - 32.0f <= screenPos.y &&
 				 tabSprite_->transform_.position.y + 32.0f >= screenPos.y)) {
 			 // サイズ
-			 tabSprite_->transform_.scale.x = tabSize_.x * 1.5f;
-			 tabSprite_->transform_.scale.y = tabSize_.y * 1.5f;
+			 tabSprite_->transform_.scale.x = tabSize_.x * 1.2f;
+			 tabSprite_->transform_.scale.y = tabSize_.y * 1.2f;
 
 			 // 左クリック
 			 if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {

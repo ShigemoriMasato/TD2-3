@@ -528,6 +528,7 @@ void GameScene::InitializeOtherScene() {
 	int pBackIndex = textureManager_->GetTexture("Pause_Back.png");
 	int pPlayIndex = textureManager_->GetTexture("Pause_HowToPlay.png");
 	int pSeleIndex = textureManager_->GetTexture("Pause_Select.png");
+	int tabIndex = textureManager_->GetTexture("Tab_Pause.png");
 
 	int plogIndex = textureManager_->GetTexture("Pebble_01.png");
 
@@ -535,7 +536,7 @@ void GameScene::InitializeOtherScene() {
 	pauseUI_ = std::make_unique<PauseUI>();
 	pauseUI_->Initialize(drawDataManager_->GetDrawData(spriteModel.drawDataIndex), static_cast<int32_t>(guidTextureIndex), commonData_->keyManager.get(),
 		fontName, drawData, fontLoader_,
-		pBackIndex, pPlayIndex, pSeleIndex, plogIndex, pBackIndex);
+		pBackIndex, pPlayIndex, pSeleIndex, plogIndex, tabIndex);
 	// リトライ
 	pauseUI_->SetOnRetryClicked([this]() {
 		isPauseScene_ = !isPauseScene_;

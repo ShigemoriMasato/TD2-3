@@ -71,7 +71,7 @@ private:
 
 	// tab画像UI
 	std::unique_ptr<SpriteObject> tabSprite_;
-	Vector2 tabSize_ = { 180,64.0f };
+	Vector2 tabSize_ = { 190,74.0f };
 
 	/// 音声
 
