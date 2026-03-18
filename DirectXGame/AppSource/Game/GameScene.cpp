@@ -747,7 +747,7 @@ void GameScene::InGameScene() {
 
 	// マウスの位置に鉱石が存在していればユニットを動かす
 	Vector3 oreWorldPos = {};
-	if (oreItemManager_->IsSelectOre(cameraController_->GetWorldPos(), oreWorldPos)) {
+	if (oreItemManager_->IsSelectOre(cameraController_->GetWorldPos(), oreWorldPos) && !isInputPress_) {
 
 		// 左クリックを取得
 		if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
@@ -825,10 +825,12 @@ void GameScene::InGameScene() {
 			pressTimer_ += FpsCount::deltaTime / 0.5f;
 
 			if (pressTimer_ >= 1.0f) {
+				isInputPress_ = true;
 				unitManager_->PressMovePlayer(cameraController_->GetWorldPos());
 			}
 		} else {
 			pressTimer_ = 0.0f;
+			isInputPress_ = false;
 		}
 	}
 
