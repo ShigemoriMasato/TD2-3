@@ -97,10 +97,11 @@ void GameUIManager::Initialize(DrawData spriteData, int starTexture, int lineTex
 
 	timeSH_ = AudioManager::GetInstance().GetHandleByName("TimeNews.mp3");
 
-
 #ifdef USE_IMGUI
 	RegisterDebugParam();
 #endif
+	ApplyDebugParam();
+	worldMatrix_ = Matrix::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.position);
 	ApplyDebugParam();
 }
 
