@@ -717,8 +717,6 @@ void GameScene::CommonUpdate() {
 
 }
 
-
-
 void GameScene::InGameScene() {
 
 	//====================================================

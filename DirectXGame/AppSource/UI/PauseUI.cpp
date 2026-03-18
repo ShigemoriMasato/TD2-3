@@ -208,7 +208,7 @@ void PauseUI::InUpdate() {
 				onSelectClicked_();
 			}
 
-		}else if (key[Key::DecisionPause]) {
+		} else if (key[Key::DecisionPause]) {
 			if (!AudioManager::GetInstance().IsPlay(decideSH_)) {
 				AudioManager::GetInstance().Play(decideSH_, 0.5f, false);
 			}
@@ -216,6 +216,7 @@ void PauseUI::InUpdate() {
 		    // tabで元にモデル
 			onRetryClicked_();
 			isAnimation_ = true;
+			isGuideOpen_ = false;
 			isOpenPause_ = !isOpenPause_;
 			// 戻る処理
 			if (!isOpenPause_) {
