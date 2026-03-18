@@ -93,10 +93,15 @@ void OreItemManager::Update(bool isOpenMap) {
 
 		// hp処理
 		float p = static_cast<float>(ore->GetMaxHp()) / static_cast<float>(ore->GetHp());
-		if (isOpenMap && isLargeScale_) {
-			fontList_[it->first].hpSprite->transform_.scale.x = 5.0f * p;
-			fontList_[it->first].font->transform_.scale = Vector3(0.01f, -0.01f, 1.0f) * 3.0f;
-			fontList_[it->first].font->transform_.position = fontList_[it->first].fontPos + Vector3(-1.0f, 0.0f, 0.0f);
+		if (isOpenMap) {
+
+			if (isLargeScale_) {
+				fontList_[it->first].hpSprite->transform_.scale.x = 5.0f * p;
+				fontList_[it->first].font->transform_.scale = Vector3(0.01f, -0.01f, 1.0f) * 3.0f;
+				fontList_[it->first].font->transform_.position = fontList_[it->first].fontPos + Vector3(-1.0f, 0.0f, -0.5f);
+			} else {
+				fontList_[it->first].font->transform_.position = fontList_[it->first].fontPos + Vector3(0.0f, 0.0f, -0.25f);
+			}
 		} else {
 			fontList_[it->first].hpSprite->transform_.scale.x = 2.0f * p;
 			fontList_[it->first].font->transform_.scale = Vector3(0.01f, -0.01f, 1.0f);
@@ -112,13 +117,18 @@ void OreItemManager::Update(bool isOpenMap) {
 			fontList_[it->first].font->transform_.rotate.x = -1.3f;
 
 			hpPosZ = fontList_[it->first].hpSprite->transform_.position;
-			fontList_[it->first].hpSprite->transform_.position.z -= 1.0f;
-			fontList_[it->first].hpSprite->transform_.position.y += 1.0f;
-			fontList_[it->first].hpSprite->transform_.position.x += -1.5f;
-			fontList_[it->first].hpSprite->transform_.rotate.x = -1.2f;
 
 			if (isLargeScale_) {
+				// bg
 				fontList_[it->first].bgSprite->transform_.scale *= 3.0f;
+				// hp
+				fontList_[it->first].hpSprite->transform_.position.y += 1.0f;
+				fontList_[it->first].hpSprite->transform_.position.z -= 1.0f;
+				fontList_[it->first].hpSprite->transform_.position.x += -1.5f;
+				fontList_[it->first].hpSprite->transform_.rotate.x = -1.2f;
+			} else {
+				fontList_[it->first].hpSprite->transform_.position.y += 0.5f;
+				fontList_[it->first].hpSprite->transform_.position.z -= 0.15f;
 			}
 		} else {
 			fontList_[it->first].bgSprite->transform_.rotate.x = -2.4f;
