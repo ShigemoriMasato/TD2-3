@@ -22,7 +22,7 @@ void CollectEffectUI::Initialize(DrawData spriteDrawData, int texture, int lineT
 	// ライン描画
 	lineSpriteObject_ = std::make_unique<SpriteObject>();
 	lineSpriteObject_->Initialize(spriteDrawData, { 1280.0f,128.0f }, BlendStateID::Add);
-	lineSpriteObject_->transform_.position = { 640.0f,135.0f,0.0f };
+	lineSpriteObject_->transform_.position = { 640.0f,100.0f,0.0f };
 	lineSpriteObject_->color_ = { 1.0f,1.0f,1.0f,0.9f };
 	lineSpriteObject_->texture_ = lineTexture;
 	lineSpriteObject_->Update();
