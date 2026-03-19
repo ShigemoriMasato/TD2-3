@@ -469,7 +469,7 @@ void GameScene::Initialize() {
 	guideSprite_->Update();
 
 
-	if (commonData_->nextStageIndex == 0) {
+	if ((commonData_->nextStageIndex == 0) && commonData_->stageCount <= 1) {
 		isOpenGuide_ = true;
 	} else {
 		isOpenGuide_ = false;
