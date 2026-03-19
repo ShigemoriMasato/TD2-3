@@ -1,8 +1,7 @@
 #include "KeyManager.h"
 
-void KeyManager::Initialize(SHEngine::Input* input, MainDisplay* display) {
+void KeyManager::Initialize(Input* input) {
 	input_ = input;
-	display_ = display;
 	keyHistory_.resize(kMaxHistory_);
 	buttonHistory_.resize(kMaxHistory_);
 	stickHistory_.resize(kMaxHistory_);
@@ -152,9 +151,6 @@ void KeyManager::Update() {
 			state = (currentValue > toggleValue);
 		} else {
 			//左スティック
-			Vector2 KeyManager::GetCursorPos() const {
-				return Vector2();
-			}
 			state = (currentValue < toggleValue);
 		}
 

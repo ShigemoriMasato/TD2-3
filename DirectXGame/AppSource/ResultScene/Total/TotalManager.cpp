@@ -22,7 +22,7 @@ void TotalManager::Initialize(int maxOre, int getOre, int killOre, int totalGold
 	maxGold_->Initialize(fontName, L"フロア最大Gold: " + std::to_wstring(maxGold), drawData, fontLoader);
 
 	uiMessage_ = std::make_unique<FontObject>();
-	uiMessage_->Initialize(fontName, L"Space to Title", drawData, fontLoader);
+	uiMessage_->Initialize(fontName, L"Press Button to Title", drawData, fontLoader);
 
 	colors_.resize(5);
 	Load();
