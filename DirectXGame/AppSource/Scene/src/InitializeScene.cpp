@@ -225,6 +225,7 @@ void InitializeScene::SetupKeyManager() {
 	keyManager->SetKey(Key::Correct, DIK_SPACE, KeyState::Trigger);
 	keyManager->SetKey(Key::Correct, DIK_Z, KeyState::Trigger);
 	keyManager->SetButton(Key::Correct, XBoxController::kA, KeyState::Trigger);
+	keyManager->SetMouse(Key::Correct, 0, KeyState::Trigger);
 
 	keyManager->SetKey(Key::Reverse, DIK_X, KeyState::Trigger);
 	keyManager->SetButton(Key::Reverse, XBoxController::kB, KeyState::Trigger);
