@@ -151,7 +151,7 @@ void MiniMap::Draw(Window* window) {
 	Matrix4x4 mat = Matrix::MakeAffineMatrix({scale.x + 0.1f, scale.y, scale.z}, {0.0f, 0.0f, 1.57f}, pos);
 	bg_->CopyBufferData(0, &mat, sizeof(Matrix4x4));
 	bg_->CopyBufferData(1, &bgti_, sizeof(int));
-	bg_->Draw(window);
+	//bg_->Draw(window);
 
 	miniMapRender_->CopyBufferData(0, &matWorld, sizeof(Matrix4x4));
 	int textureIndex = display_->GetTextureData()->GetOffset();
