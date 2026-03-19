@@ -220,6 +220,8 @@ void GameScene::Initialize() {
 	int hpModeID = modelManager_->LoadModel(unitHpModelName);
 	auto hpMode = modelManager_->GetNodeModelData(hpModeID);
 
+	int clockIconiTextureIndex = textureManager_->GetTexture("Clock.png");
+
 	// 鉱石の管理システムを初期化
 	oreItemManager_ = std::make_unique<OreItemManager>();
 	// 描画データを設定ｓる
@@ -227,7 +229,7 @@ void GameScene::Initialize() {
 		smallIndex, midleIndex, largeIndex);
 	oreItemManager_->Initialize(drawDataManager_->GetDrawData(sprModel.drawDataIndex), drawDataManager_->GetDrawData(hpMode.drawDataIndex),
 		fontName, draw, fontLoader_, drawDataManager_->GetDrawData(boxModel.drawDataIndex),
-		commonData_->nextStageIndex);
+		commonData_->nextStageIndex, clockIconiTextureIndex);
 
 	// 鉱石の回収ノルマを設定
 	OreItemStorageNum::maxOreItemNum_ = currentMap_.norma;
@@ -354,7 +356,6 @@ void GameScene::Initialize() {
 	// icon
 	int oreItemTextureIndex = textureManager_->GetTexture("OreItem.png");
 	int oreiTextureIndex = textureManager_->GetTexture("Ore.png");
-	int clockIconiTextureIndex = textureManager_->GetTexture("Clock.png");
 
 	// ゲームのUI管理クラス
 	gameUIManager_ = std::make_unique<GameUIManager>();

@@ -7,13 +7,15 @@
 #include"Object/GoldOre.h"
 #include <LightManager.h>
 
-void OreItemManager::Initialize(DrawData spriteDrawData, DrawData hpDrawData, const std::string& fontName, DrawData fontDrawData, FontLoader* fontLoader, DrawData drawData, int stageNum) {
+void OreItemManager::Initialize(DrawData spriteDrawData, DrawData hpDrawData, const std::string& fontName, DrawData fontDrawData, FontLoader* fontLoader, DrawData drawData, int stageNum, int icon) {
 
 	fontLoader_ = fontLoader;
 	fontName_ = fontName;
 	fontDrawData_ = fontDrawData;
 	spriteDrawData_ = spriteDrawData;
 	hpDrawData_ = hpDrawData;
+
+	iconTex_ = icon;
 
 	// メモリを確保
 	oreItems_.reserve(20);
@@ -264,6 +266,7 @@ void OreItemManager::Draw(Window* window, const Matrix4x4& vpMatrix) {
 	for (auto& data : addTimerFontList_) {
 		if (data.isFinished_) { continue; }
 		data.font3d->Draw(window, vpMatrix);
+		data.icon3d->Draw(window, vpMatrix);
 	}
 }
 
@@ -281,6 +284,7 @@ void OreItemManager::DrawTimeUI(Window* window, const Matrix4x4& vpMatrix) {
 	for (auto& data : addTimerFontList_) {
 		if (data.isFinished_) { continue; }
 		data.font2d->Draw(window, vpMatrix);
+		data.icon2d->Draw(window, vpMatrix);
 	}
 }
 
@@ -502,6 +506,14 @@ void OreItemManager::AddTimerUI(const Vector3& pos, OreType oreType) {
 	timerData.font3d->transform_.scale = Vector3(0.02f, -0.02f, 1.0f);
 	timerData.font3d->fontColor_ = { 0.0f,1.0f,1.0f,1.0f };
 	timerData.font3d->Update();
+	// 3dIcon
+	timerData.icon3d = std::make_unique<SpriteObject>();
+	timerData.icon3d->Initialize(spriteDrawData_, {1.0f,1.0f });
+	timerData.icon3d->transform_.position = pos + Vector3(-1.2f,0.0f,0.5f);
+	timerData.icon3d->color_ = { 1.0f,1.0f,1.0f,1.0f };
+	timerData.icon3d->transform_.rotate.x = 1.4f;
+	timerData.icon3d->SetTexture(iconTex_);
+	timerData.icon3d->Update();
 
 	timerData.startPosY_ = pos.y;
 
@@ -512,6 +524,13 @@ void OreItemManager::AddTimerUI(const Vector3& pos, OreType oreType) {
 	timerData.font2d->transform_.scale = Vector3(0.8f, -0.8f, 1.0f);
 	timerData.font2d->fontColor_ = { 0.0f,1.0f,1.0f,1.0f };
 	timerData.font2d->Update();
+	// 2dicon
+	timerData.icon2d = std::make_unique<SpriteObject>();
+	timerData.icon2d->Initialize(spriteDrawData_, { 64.0f,64.0f });
+	timerData.icon2d->transform_.position = { 1200.0f - 48.0f,128.0f,0.0f };
+	timerData.icon2d->color_ = { 1.0f,1.0f,1.0f,1.0f };
+	timerData.icon2d->SetTexture(iconTex_);
+	timerData.icon2d->Update();
 
 	// UIを登録する
 	addTimerFontList_.push_back(std::move(timerData));
@@ -530,12 +549,16 @@ void OreItemManager::TimerUIUpdate() {
 		data.timer_ += FpsCount::deltaTime / 1.0f;
 
 		data.font2d->transform_.position.y = lerp(180.0f, 80.0f, data.timer_, EaseType::EaseInCubic);
+		data.icon2d->transform_.position.y = lerp(180.0f, 80.0f, data.timer_, EaseType::EaseInCubic);
 
 		data.font3d->transform_.position.y = lerp(data.startPosY_,5.0f,data.timer_,EaseType::EaseInCubic);
+		data.icon3d->transform_.position.y = lerp(data.startPosY_,5.0f,data.timer_,EaseType::EaseInCubic);
 
 		// 更新処理
 		data.font2d->Update();
 		data.font3d->Update();
+		data.icon2d->Update();
+		data.icon3d->Update();
 
 		if (data.timer_ >= 1.0f) {
 			data.isFinished_ = true;

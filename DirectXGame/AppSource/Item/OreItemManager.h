@@ -7,6 +7,7 @@
 #include"Object/OreOutLineObject.h"
 #include"UI/Object/FontObject.h"
 #include"GameCommon/DefaultObject.h"
+#include"UI/Object/SpriteObject.h"
 
 #include"Unit/MapChipField.h"
 #include"Effect/OreFragmentParticle.h"
@@ -17,7 +18,7 @@
 class OreItemManager {
 public:
 
-	void Initialize(DrawData spriteDrawData, DrawData hpDrawData,const std::string& fontName, DrawData fontDrawData, FontLoader* fontLoader, DrawData drawData,int stageNum);
+	void Initialize(DrawData spriteDrawData, DrawData hpDrawData,const std::string& fontName, DrawData fontDrawData, FontLoader* fontLoader, DrawData drawData,int stageNum,int icon);
 
 	void Update(bool isOpenMap = false);
 
@@ -119,6 +120,8 @@ private:
 	// 泥の位置リスト
 	std::vector<DirtData> dirtDataList_;
 
+	int iconTex_ = 0;
+
 private: // フォント機能
 
 	struct TextData {
@@ -131,7 +134,9 @@ private: // フォント機能
 	// 時間の追加UI
 	struct TimerData {
 		std::unique_ptr<FontObject> font3d;
+		std::unique_ptr<SpriteObject> icon3d;
 		std::unique_ptr<FontObject> font2d;
+		std::unique_ptr<SpriteObject> icon2d;
 		float startPosY_ = 0.0f;
 		bool isFinished_ = false;
 		float timer_ = 0.0f;
