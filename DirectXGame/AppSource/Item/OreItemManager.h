@@ -122,6 +122,8 @@ private:
 
 	int iconTex_ = 0;
 
+	uint32_t addTimeSH_ = 0;
+
 private: // フォント機能
 
 	struct TextData {

@@ -2,6 +2,7 @@
 #include"FpsCount.h"
 #include"RandomGenerator.h"
 #include"Utility/Easing.h"
+#include"Assets/Audio/AudioManager.h"
 
 // 各鉱石
 #include"Object/GoldOre.h"
@@ -36,6 +37,8 @@ void OreItemManager::Initialize(DrawData spriteDrawData, DrawData hpDrawData, co
 	// 泥のパーティクル
 	dirtMoveParticle_ = std::make_unique<DirtMoveParticle>();
 	dirtMoveParticle_->Initialize(drawData);
+
+	addTimeSH_ = AudioManager::GetInstance().GetHandleByName("AddTime.mp3");
 
 	if (stageNum >= 1) {
 		isLargeScale_ = true;
@@ -471,6 +474,8 @@ OreItem* OreItemManager::GetOreItemForId() {
 }
 
 void OreItemManager::AddTimerUI(const Vector3& pos, OreType oreType) {
+
+	AudioManager::GetInstance().Play(addTimeSH_, 0.5f, false);
 
 	TimerData timerData;
 
