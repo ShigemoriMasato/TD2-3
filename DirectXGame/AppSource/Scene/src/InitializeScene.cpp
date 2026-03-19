@@ -143,7 +143,7 @@ void InitializeScene::SetupKeyManager() {
 	commonData_->keyManager = std::make_unique<KeyManager>();
 
 	auto keyManager = commonData_->keyManager.get();
-	keyManager->Initialize();
+	keyManager->Initialize(input_);
 
 	//KeyConfigの設定
 	keyManager->SetKey(Key::Right, DIK_D, KeyState::Hold);
