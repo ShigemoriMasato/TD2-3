@@ -127,6 +127,8 @@ void GameUIManager::Update(const int32_t& unitNum, const int32_t& maxUnitNum) {
 	// 鉱石の数を更新
 	oreItemUI_->Update(OreItemStorageNum::currentOreItemNum_, OreItemStorageNum::maxOreItemNum_);
 
+	upSpriteObject_->color_ = bgColor_;
+
 	// ノルマの文字を変える
 	if (OreItemStorageNum::currentOreItemNum_ >= OreItemStorageNum::maxOreItemNum_) {
 		// ノルマクリア
@@ -135,7 +137,7 @@ void GameUIManager::Update(const int32_t& unitNum, const int32_t& maxUnitNum) {
 		quotaFontObject_->transform_.position.x = 834.0f;
 		quotaClearEffectUI_->isLoop_ = true;
 
-		upSpriteObject_->color_ = bgColor_;
+		//upSpriteObject_->color_ = bgColor_;
 
 		// 回収演出
 		if (oreItemUI_->IsNumChanged()) {
